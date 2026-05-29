@@ -8,6 +8,12 @@
 | --- | --- | --- | --- |
 | [`format/number`](../kits/format/number/README.md) | `vanilla-ts` | 숫자 콤마 표기, 천원 단위 금액 변환, 로마 숫자 변환이 필요할 때 | `kits/format/number/` |
 
+## Browser
+
+| Unit | Runtime | Use when | Copy path |
+| --- | --- | --- | --- |
+| [`browser/viewport`](../kits/browser/viewport/README.md) | `vanilla-ts` | 모바일 브라우저의 실제 viewport 높이를 CSS 변수로 보정해야 할 때 | `kits/browser/viewport/` |
+
 ## Reading Order
 
 1. 필요한 문제 영역을 이 파일에서 찾습니다.

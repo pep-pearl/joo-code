@@ -27,6 +27,7 @@ Use this file to decide the minimum files to read before making structural, docu
 | Kit | Runtime | Source | Notes |
 | --- | --- | --- | --- |
 | `format/number` | `vanilla-ts` | `kits/format/number/vanilla-ts/index.ts` | First migrated copy-ready unit |
+| `browser/viewport` | `vanilla-ts` | `kits/browser/viewport/vanilla-ts/index.ts` | Browser viewport height CSS variable helper |
 
 ## Navigation Rules
 

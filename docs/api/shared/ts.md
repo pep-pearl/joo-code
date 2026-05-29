@@ -182,7 +182,7 @@ Re-exports [hasWindow](ts/api-client/http-client/storage.md#haswindow)
 
 ### initViewportHeight
 
-Re-exports [initViewportHeight](ts/dom/viewport.md#initviewportheight)
+Re-exports [initViewportHeight](../kits/browser/viewport/vanilla-ts.md#initviewportheight)
 
 ***
 

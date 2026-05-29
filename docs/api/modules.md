@@ -16,6 +16,8 @@
 - [frontend/react-ts/src/types](frontend/react-ts/src/types.md)
 - [frontend/react-ts/src/types/common](frontend/react-ts/src/types/common.md)
 - [frontend/react-ts/src/types/react-router](frontend/react-ts/src/types/react-router.md)
+- [kits/browser/viewport](kits/browser/viewport.md)
+- [kits/browser/viewport/vanilla-ts](kits/browser/viewport/vanilla-ts.md)
 - [kits/format/number](kits/format/number.md)
 - [kits/format/number/vanilla-ts](kits/format/number/vanilla-ts.md)
 - [shared/js](shared/js.md)

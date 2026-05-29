@@ -12,4 +12,4 @@
 
 ### initViewportHeight
 
-Re-exports [initViewportHeight](dom/viewport.md#initviewportheight)
+Re-exports [initViewportHeight](../../kits/browser/viewport/vanilla-ts.md#initviewportheight)

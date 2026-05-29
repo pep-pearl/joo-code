@@ -21,6 +21,7 @@
 | Kit | Use when | Copy path |
 | --- | --- | --- |
 | [`format/number`](kits/format/number/README.md) | 숫자 포맷과 변환 유틸이 필요할 때 | `kits/format/number/` |
+| [`browser/viewport`](kits/browser/viewport/README.md) | 모바일 브라우저 viewport 높이 보정이 필요할 때 | `kits/browser/viewport/` |
 
 ## How To Use
 
