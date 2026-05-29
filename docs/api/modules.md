@@ -20,6 +20,8 @@
 - [kits/browser/viewport/vanilla-ts](kits/browser/viewport/vanilla-ts.md)
 - [kits/format/number](kits/format/number.md)
 - [kits/format/number/vanilla-ts](kits/format/number/vanilla-ts.md)
+- [kits/react/hooks/use-debounced-value](kits/react/hooks/use-debounced-value.md)
+- [kits/react/hooks/use-debounced-value/react](kits/react/hooks/use-debounced-value/react.md)
 - [shared/js](shared/js.md)
 - [shared/ts](shared/ts.md)
 - [shared/ts/api-client](shared/ts/api-client.md)

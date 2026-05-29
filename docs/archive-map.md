@@ -14,6 +14,12 @@
 | --- | --- | --- | --- |
 | [`browser/viewport`](../kits/browser/viewport/README.md) | `vanilla-ts` | 모바일 브라우저의 실제 viewport 높이를 CSS 변수로 보정해야 할 때 | `kits/browser/viewport/` |
 
+## React
+
+| Unit | Runtime | Use when | Copy path |
+| --- | --- | --- | --- |
+| [`react/hooks/use-debounced-value`](../kits/react/hooks/use-debounced-value/README.md) | `react` | 빠르게 바뀌는 값을 지연 반영해 API 호출이나 후속 처리를 줄이고 싶을 때 | `kits/react/hooks/use-debounced-value/` |
+
 ## Reading Order
 
 1. 필요한 문제 영역을 이 파일에서 찾습니다.

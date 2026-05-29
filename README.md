@@ -22,6 +22,7 @@
 | --- | --- | --- |
 | [`format/number`](kits/format/number/README.md) | 숫자 포맷과 변환 유틸이 필요할 때 | `kits/format/number/` |
 | [`browser/viewport`](kits/browser/viewport/README.md) | 모바일 브라우저 viewport 높이 보정이 필요할 때 | `kits/browser/viewport/` |
+| [`react/hooks/use-debounced-value`](kits/react/hooks/use-debounced-value/README.md) | 빠르게 바뀌는 값을 지연 반영하는 React hook이 필요할 때 | `kits/react/hooks/use-debounced-value/` |
 
 ## How To Use
 

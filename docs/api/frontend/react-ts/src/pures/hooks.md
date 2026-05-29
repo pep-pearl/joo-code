@@ -13,4 +13,4 @@
 
 ### useDebouncedValue
 
-Re-exports [useDebouncedValue](hooks/useDebouncedValue.md#usedebouncedvalue)
+Re-exports [useDebouncedValue](../../../../kits/react/hooks/use-debounced-value/react.md#usedebouncedvalue)
