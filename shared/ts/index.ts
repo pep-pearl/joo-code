@@ -8,3 +8,5 @@
 export * from "./dom";
 
 export * from "./format";
+
+export * from "./api-client";
