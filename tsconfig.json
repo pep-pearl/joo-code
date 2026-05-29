@@ -12,6 +12,6 @@
     "isolatedModules": true,
     "resolveJsonModule": true
   },
-  "include": ["shared/**/*", "frontend/**/*", "playgrounds/**/*"],
+  "include": ["shared/**/*", "frontend/**/*", "kits/**/*", "playgrounds/**/*"],
   "exclude": ["node_modules", "**/dist", "docs"]
 }

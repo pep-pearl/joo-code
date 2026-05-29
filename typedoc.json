@@ -1,17 +1,16 @@
 {
   "$schema": "https://typedoc.org/schema.json",
   "entryPointStrategy": "expand",
-  "entryPoints": ["shared/js", "shared/ts", "frontend/react-ts"],
-  "out": "docs", // 문서가 저장될 폴더명
+  "entryPoints": ["shared/js", "shared/ts", "frontend/react-ts", "kits"],
+  "out": "docs/api",
   "plugin": ["typedoc-plugin-markdown"],
   "hideGenerator": true,
-  "name": "Joo Code Library API",
-  "readme": "README.md", // "파일명.md" 각 패키지 폴더으 파일명.md를 읽어 옴 / "none": 개별 README는 무시하고 JSDoc 위주로 추출
-
-  "outputFileStrategy": "modules", // 파일마다 쪼개지 않고 모듈(패키지) 단위로 파일을 합칩니다.
-  "hideBreadcrumbs": false, // 내비게이션(Breadcrumbs)을 보여줘서 뒤로가기 편하게 합니다.
+  "name": "Joo Code Archive API",
+  "readme": "README.md",
+  "outputFileStrategy": "modules",
+  "hideBreadcrumbs": false,
   "indexFormat": "list",
-  "entryFileName": "README.md", // 인덱스 파일명을 README.md로 고정
+  "entryFileName": "README.md",
   "navigationModel": {
     "excludeGroups": false,
     "excludeCategories": false,

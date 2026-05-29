@@ -8,7 +8,8 @@ The repository is organized around reusable logic:
 
 - `shared/*`: environment-independent shared utilities
 - `frontend/*`: frontend-oriented utilities, hooks, patterns, and types
-- `docs/*`: TypeDoc-generated API documentation
+- `docs/api/*`: TypeDoc-generated API documentation
+- `docs/archive-map.md`, `docs/migration.md`, `docs/unit-grades.md`: manually maintained archive guidance
 - `rules/*`: repository-specific agent guidance
 
 ## Documentation Role
@@ -33,12 +34,12 @@ Use that file as the source of truth for:
 When changing exported functions, hooks, types, constants, or modules:
 
 - update the source JSDoc together with the code change
-- prefer editing source JSDoc over editing generated files in `docs/`
+- prefer editing source JSDoc over editing generated files in `docs/api/`
 - keep descriptions aligned with the actual implementation
 - document default values, units, fallback behavior, and unsupported inputs when applicable
 - run or recommend `yarn docs` after JSDoc changes
 
-Generated API files under `docs/` should reflect source comments. Do not manually patch generated output unless the task explicitly asks for generated Markdown edits.
+Generated API files under `docs/api/` should reflect source comments. Do not manually patch generated output unless the task explicitly asks for generated Markdown edits.
 
 ## joo-code Documentation Style
 
@@ -69,7 +70,7 @@ Avoid:
 After documentation or public API changes, check whether the following need updates:
 
 - source JSDoc
-- generated `docs/` output
+- generated `docs/api/` output
 - root `README.md` documentation links
 - `rules/docs-writing-guide.md`
 
