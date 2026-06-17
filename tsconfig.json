@@ -1,17 +1,15 @@
 {
   "compilerOptions": {
+    "target": "ES2022",
     "module": "ESNext",
-    "target": "ESNext",
-    "moduleResolution": "bundler",
-    "lib": ["DOM", "DOM.Iterable", "ESNext"],
-    "allowJs": true,
-    "checkJs": false,
+    "moduleResolution": "Bundler",
+    "lib": ["DOM", "DOM.Iterable", "ES2022"],
     "strict": true,
+    "noEmit": true,
     "skipLibCheck": true,
     "esModuleInterop": true,
     "isolatedModules": true,
-    "resolveJsonModule": true
+    "jsx": "react-jsx"
   },
-  "include": ["shared/**/*", "frontend/**/*", "kits/**/*", "playgrounds/**/*"],
-  "exclude": ["node_modules", "**/dist", "docs"]
+  "include": ["src/**/*.ts", "src/**/*.tsx", "playground/**/*.ts", "playground/**/*.tsx"]
 }
