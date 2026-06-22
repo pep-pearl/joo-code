@@ -4,3 +4,7 @@ coverage/
 *.log
 *.zip
 .DS_Store
+
+temp/
+*storybook.log
+storybook-static

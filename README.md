@@ -20,6 +20,8 @@
 | React 값 debounce | [`useDebouncedValue`](src/react/useDebouncedValue.ts) | 파일 1개 | React |
 | 현재 React Router 경로 조회 | [`useCurrentRoute`](src/react-router/useCurrentRoute.ts) | 폴더 또는 파일 | React Router |
 | 인증·refresh 포함 API 요청 | [`api-client`](src/api-client/README.md) | 폴더 전체 | 없음 |
+| 재사용 UI 컴포넌트 | [`ui`](src/ui/README.md) | 컴포넌트와 공통 파일 | React, Tailwind CSS |
+| UI 컴포넌트 시각 확인 | [Storybook](.storybook/main.ts) | 저장소 내부 사용 | Storybook |
 | 브라우저에서 코드 실행 확인 | [`playground`](playground/README.md) | 저장소 내부 사용 | Vite, React |
 | 공유용 프로젝트 ZIP 생성 | [`project-zip`](tools/project-zip/README.md) | 스크립트 1개 | Node.js |
 
@@ -33,7 +35,9 @@ joo-code/
 │  ├─ react/          # React만 사용하는 코드
 │  ├─ react-router/   # React Router 의존 코드
 │  ├─ api-client/     # 여러 파일이 함께 동작하는 복합 모듈
+│  ├─ ui/             # 재사용 UI 컴포넌트와 Storybook 스토리
 │  └─ index.ts        # 전체 public API
+├─ .storybook/        # UI 컴포넌트 문서와 시각 확인 설정
 ├─ playground/        # src의 public API를 직접 실행하는 Vite 앱
 ├─ tools/             # 다른 프로젝트에도 복사 가능한 작업 도구
 ├─ package.json
@@ -111,6 +115,8 @@ ZIP 도구 자체도 [`zip-project.mjs`](tools/project-zip/zip-project.mjs) 한 
 | `npm run check` | `src`와 playground TypeScript 검사 |
 | `npm run playground` | playground 개발 서버 실행 |
 | `npm run playground:build` | playground 프로덕션 빌드 검사 |
+| `npm run storybook` | UI 컴포넌트 Storybook 개발 서버 실행 |
+| `npm run build-storybook` | 정적 Storybook 빌드 검사 |
 | `npm run zip` | 현재 프로젝트 공유용 ZIP 생성 |
 
 ## 새 코드 추가 규칙
@@ -119,7 +125,7 @@ ZIP 도구 자체도 [`zip-project.mjs`](tools/project-zip/zip-project.mjs) 한 
 2. 공개 함수 하나당 같은 이름의 파일 하나를 만든다.
 3. 같은 폴더의 `index.ts`에 export를 추가한다.
 4. 루트의 **바로 찾기** 표에 한 줄 추가한다.
-5. 동작을 눈으로 확인해야 한다면 playground에 작은 예제를 추가한다.
+5. 함수 동작은 playground에, UI 컴포넌트 상태는 Storybook에 작은 예제를 추가한다.
 
 여러 파일이 반드시 함께 움직이는 코드만 별도 폴더로 묶습니다. 파일이 두세 개라는 이유만으로 새 패키지나 workspace를 만들지 않습니다.
 
