@@ -5,6 +5,9 @@ coverage/
 *.zip
 .DS_Store
 
+# 임시
 temp/
+api-slot-kit/
+
 *storybook.log
 storybook-static
