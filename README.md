@@ -20,6 +20,7 @@
 | React 값 debounce | [`useDebouncedValue`](src/react/useDebouncedValue.ts) | 파일 1개 | React |
 | 현재 React Router 경로 조회 | [`useCurrentRoute`](src/react-router/useCurrentRoute.ts) | 폴더 또는 파일 | React Router |
 | 인증·refresh 포함 API 요청 | [`api-client`](src/api-client/README.md) | 폴더 전체 | 없음 |
+| API 경로와 메서드 트리 관리 | [`api-tree`](src/api-tree/README.md) | 폴더 전체 | 없음 |
 | CSS Grid 레이아웃 구성 | [`GridLayout`](src/ui/GridLayout.tsx) | 파일과 공통 타입 | React, Tailwind CSS |
 | 재사용 UI 컴포넌트 | [`ui`](src/ui/README.md) | 컴포넌트와 공통 파일 | React, Tailwind CSS |
 | UI 컴포넌트 시각 확인 | [Storybook](.storybook/main.ts) | 저장소 내부 사용 | Storybook |
@@ -36,6 +37,7 @@ joo-code/
 │  ├─ react/          # React만 사용하는 코드
 │  ├─ react-router/   # React Router 의존 코드
 │  ├─ api-client/     # 여러 파일이 함께 동작하는 복합 모듈
+│  ├─ api-tree/       # API 경로와 HTTP 메서드 선언 트리
 │  ├─ ui/             # 재사용 UI 컴포넌트와 Storybook 스토리
 │  └─ index.ts        # 전체 public API
 ├─ .storybook/        # UI 컴포넌트 문서와 시각 확인 설정
