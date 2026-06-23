@@ -18,6 +18,7 @@
 | 로마 숫자 변환 | [`romanToNumber`](src/format/romanToNumber.ts) | 파일 1개 | 없음 |
 | 모바일 viewport 높이 보정 | [`initViewportHeight`](src/browser/initViewportHeight.ts) | 파일 1개 | 브라우저 DOM |
 | React 값 debounce | [`useDebouncedValue`](src/react/useDebouncedValue.ts) | 파일 1개 | React |
+| React 페이지네이션 구성 | [`pagination`](src/react/pagination/README.md) | 파일 또는 폴더 | React |
 | 현재 React Router 경로 조회 | [`useCurrentRoute`](src/react-router/useCurrentRoute.ts) | 폴더 또는 파일 | React Router |
 | 인증·refresh 포함 API 요청 | [`api-client`](src/api-client/README.md) | 폴더 전체 | 없음 |
 | API 경로와 메서드 트리 관리 | [`api-tree`](src/api-tree/README.md) | 폴더 전체 | 없음 |
@@ -62,7 +63,7 @@ npm run check
 npm run playground
 ```
 
-`npm run playground`를 실행하면 브라우저에서 숫자 포맷, 로마 숫자, debounce hook, viewport 높이 코드를 직접 확인할 수 있습니다.
+`npm run playground`를 실행하면 브라우저에서 숫자 포맷, 로마 숫자, debounce hook, viewport 높이, 페이지네이션, API tree 코드를 직접 확인할 수 있습니다. UI 컴포넌트는 Storybook에서 확인합니다.
 
 ## 코드를 사용하는 두 가지 방법
 

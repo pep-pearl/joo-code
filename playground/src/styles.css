@@ -145,6 +145,36 @@ dd {
   margin: 20px 0 0;
 }
 
+.pagination {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 20px;
+}
+
+.pagination button {
+  min-width: 38px;
+  min-height: 38px;
+  padding: 7px 10px;
+  border: 1px solid #c5c8ce;
+  border-radius: 9px;
+  background: #fff;
+  color: #35383d;
+  cursor: pointer;
+}
+
+.pagination button[aria-current="page"] {
+  border-color: #202124;
+  background: #202124;
+  color: #fff;
+  font-weight: 800;
+}
+
+.pagination button:disabled {
+  cursor: not-allowed;
+  opacity: 0.4;
+}
+
 .viewport-sample {
   display: grid;
   height: calc(var(--vh, 1vh) * 18);

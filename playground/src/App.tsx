@@ -1,17 +1,32 @@
 import { useEffect, useState } from "react";
 import {
+  apiMap,
   formatCommaNumber,
   formatThousandToEok,
   initViewportHeight,
   romanToNumber,
   useDebouncedValue,
+  usePages,
+  usePaginationButtonsAttrs,
 } from "../../src";
 
 export function App() {
   const [amount, setAmount] = useState("100000");
   const [roman, setRoman] = useState("XIV");
   const [searchText, setSearchText] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
   const debouncedSearchText = useDebouncedValue(searchText, 500);
+  const maxPage = 12;
+  const pages = usePages({ max: maxPage, offset: 5, current: currentPage });
+  const { firstAttrs, prevAttrs, nextAttrs, lastAttrs } =
+    usePaginationButtonsAttrs({
+      max: maxPage,
+      current: currentPage,
+      onChange: setCurrentPage,
+    });
+
+  const postUpdateEndpoint = apiMap.posts[":postId"].update;
+  const postUpdatePath = postUpdateEndpoint.path.replace(":postId", "42");
 
   useEffect(() => initViewportHeight(), []);
 
@@ -90,6 +105,67 @@ export function App() {
           <div className="viewport-sample">
             <span>calc(var(--vh) × 18)</span>
           </div>
+        </article>
+
+        <article className="card">
+          <h2>Pagination Hooks</h2>
+          <p>
+            현재 페이지 주변 번호와 이동 버튼 속성을 두 훅으로 구성합니다.
+          </p>
+          <nav className="pagination" aria-label="페이지 이동 예제">
+            <button type="button" {...firstAttrs}>
+              처음
+            </button>
+            <button type="button" {...prevAttrs}>
+              이전
+            </button>
+            {pages.map((page) => (
+              <button
+                key={page}
+                type="button"
+                aria-current={page === currentPage ? "page" : undefined}
+                onClick={() => setCurrentPage(page)}
+              >
+                {page}
+              </button>
+            ))}
+            <button type="button" {...nextAttrs}>
+              다음
+            </button>
+            <button type="button" {...lastAttrs}>
+              마지막
+            </button>
+          </nav>
+          <p className="result">
+            현재 페이지 <strong>{currentPage}</strong> / {maxPage}
+          </p>
+        </article>
+
+        <article className="card">
+          <h2>API Tree</h2>
+          <p>
+            선언된 API 트리에서 요청 메서드와 경로를 타입 안전하게 조회합니다.
+          </p>
+          <dl>
+            <div>
+              <dt>로그인</dt>
+              <dd>
+                {apiMap.auth.user.login.method} {apiMap.auth.user.login.path}
+              </dd>
+            </div>
+            <div>
+              <dt>게시글 목록</dt>
+              <dd>
+                {apiMap.posts._.method} {apiMap.posts._.path}
+              </dd>
+            </div>
+            <div>
+              <dt>42번 게시글 수정</dt>
+              <dd>
+                {postUpdateEndpoint.method} {postUpdatePath}
+              </dd>
+            </div>
+          </dl>
         </article>
       </section>
     </main>
