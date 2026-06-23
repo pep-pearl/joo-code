@@ -1,0 +1,63 @@
+<h2>Dialog 기본 UI 방향</h2>
+<p class="subtitle">기존 API와 상태 동작은 유지하고, 기본 외형만 이 저장소의 UI 체계로 교체합니다.</p>
+
+<div class="cards">
+  <div class="card" data-choice="a" onclick="toggleSelect(this)">
+    <div class="card-image" style="padding:28px;background:#eef0f4;display:grid;place-items:center;min-height:260px">
+      <div style="width:min(360px,100%);padding:24px;border:1px solid #d9dde5;border-radius:16px;background:white;box-shadow:0 18px 48px rgb(15 23 42 / 14%);font-family:Inter,sans-serif;color:#1e293b">
+        <div style="display:flex;justify-content:space-between;gap:16px;align-items:start">
+          <div>
+            <div style="font-size:17px;font-weight:750">변경사항을 저장할까요?</div>
+            <div style="margin-top:8px;color:#64748b;font-size:14px;line-height:1.55">저장하지 않고 닫으면 입력한 내용이 사라집니다.</div>
+          </div>
+          <button style="border:0;background:transparent;color:#64748b;font-size:20px">×</button>
+        </div>
+        <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:28px">
+          <button style="height:36px;padding:0 14px;border:1px solid #cbd5e1;border-radius:8px;background:white;color:#475569">취소</button>
+          <button style="height:36px;padding:0 14px;border:1px solid #6366f1;border-radius:8px;background:#6366f1;color:white">저장</button>
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>A. 기존 UI 체계에 맞춘 중립형</h3>
+      <p><code>Button</code>을 그대로 재사용하고 alert, confirm, 일반 패널의 시각 언어를 통일합니다. 권장안입니다.</p>
+    </div>
+  </div>
+
+  <div class="card" data-choice="b" onclick="toggleSelect(this)">
+    <div class="card-image" style="padding:28px;background:#eef0f4;display:grid;place-items:center;min-height:260px">
+      <div style="width:min(360px,100%);padding:24px;border-radius:20px;background:white;box-shadow:0 18px 48px rgb(15 23 42 / 15%);font-family:Inter,sans-serif;color:#1e293b">
+        <div style="width:42px;height:42px;display:grid;place-items:center;border-radius:12px;background:#fff1f2;color:#e11d48;font-size:21px">!</div>
+        <div style="margin-top:18px;font-size:18px;font-weight:750">항목을 삭제할까요?</div>
+        <div style="margin-top:8px;color:#64748b;font-size:14px;line-height:1.55">삭제한 항목은 복구할 수 없습니다.</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:26px">
+          <button style="height:40px;border:1px solid #cbd5e1;border-radius:10px;background:white;color:#475569">취소</button>
+          <button style="height:40px;border:1px solid #f43f5e;border-radius:10px;background:#f43f5e;color:white">삭제</button>
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>B. 상태 강조형</h3>
+      <p>상태 아이콘과 위험 색상을 기본 규칙으로 둡니다. 명확하지만 새 아이콘·intent API와 더 많은 디자인 규칙이 필요합니다.</p>
+    </div>
+  </div>
+
+  <div class="card" data-choice="c" onclick="toggleSelect(this)">
+    <div class="card-image" style="padding:28px;background:#eef0f4;display:grid;place-items:center;min-height:260px">
+      <div style="width:min(390px,100%);border:1px solid #d9dde5;border-radius:12px;background:white;box-shadow:0 12px 34px rgb(15 23 42 / 12%);font-family:Inter,sans-serif;color:#1e293b;overflow:hidden">
+        <div style="padding:18px 20px;border-bottom:1px solid #e2e8f0;font-size:16px;font-weight:750">프로필 편집</div>
+        <div style="padding:22px 20px;color:#64748b;font-size:14px">폼이나 사용자 정의 콘텐츠를 배치하는 넓은 본문 영역</div>
+        <div style="display:flex;justify-content:flex-end;gap:8px;padding:14px 20px;background:#f8fafc;border-top:1px solid #e2e8f0">
+          <button style="height:34px;padding:0 13px;border:1px solid #cbd5e1;border-radius:7px;background:white;color:#475569">취소</button>
+          <button style="height:34px;padding:0 13px;border:1px solid #6366f1;border-radius:7px;background:#6366f1;color:white">확인</button>
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <h3>C. 구조화된 헤더·푸터형</h3>
+      <p>복잡한 폼에는 안정적이지만 기존 compound API와 마크업 변경 폭이 커지고 단순 confirm에는 다소 무겁습니다.</p>
+    </div>
+  </div>
+</div>
+
+<p style="margin-top:24px">A를 기준으로 진행하되, 삭제 버튼은 기존 <code>Button intent="danger"</code>를 사용해 필요한 경우에만 위험 상태를 표현하는 구성이 가장 작은 변경으로 일관성을 확보합니다.</p>
