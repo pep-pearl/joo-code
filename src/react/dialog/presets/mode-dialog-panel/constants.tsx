@@ -1,5 +1,5 @@
-import { CancelButton, DeleteButton, EditButton, OkButton, SaveButton } from './modeDialogPanel.buttons';
-import type { ButtonProps } from './modeDialogPanel.types';
+import { CancelButton, DeleteButton, EditButton, OkButton, SaveButton } from './buttons';
+import type { ButtonProps } from './types';
 
 export const BOTTOM_MODE_MAP = {
   edit: (props: ButtonProps) => <EditButton {...props} />,

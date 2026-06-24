@@ -1,4 +1,3 @@
-import type { LoadableComponent } from '@loadable/component';
 import type { ComponentType, ReactNode } from 'react';
 
 export type DialogActionHandler = (event?: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void;
@@ -81,7 +80,7 @@ export interface DialogProviderUI {
   confirmAlert?: ConfirmAlertDialogUI;
 }
 
-export type PropsOf<C> = C extends ComponentType<infer P> ? P : C extends LoadableComponent<infer P> ? P : never;
+export type PropsOf<C> = C extends ComponentType<infer P> ? P : never;
 
 export type CustomAppDialogPropMap<T extends Record<string, unknown>> = {
   [K in keyof T]: PropsOf<T[K]>;

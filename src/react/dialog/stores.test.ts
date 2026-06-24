@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { useConfirmAlertDialogStore, useDialogStore } from './dialog.stores';
-import type { ConfirmDialogProps } from './dialog.types';
+import { useConfirmAlertDialogStore, useDialogStore } from './stores';
+import type { ConfirmDialogProps } from './types';
 
 const resetStores = () => {
   useDialogStore.setState({ key: undefined, props: undefined });

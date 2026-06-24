@@ -12,7 +12,7 @@ const Description: FC<ComponentProps<typeof HeadlessuiDescription>> = ({ classNa
     <HeadlessuiDescription
       className={clsx(
         className,
-        'text-xs lg:text-sm text-foreground-muted mt-1 whitespace-pre-line leading-4.5 font-light',
+        'mt-1 whitespace-pre-line text-sm leading-6 text-slate-600',
       )}
       {...props}
     >

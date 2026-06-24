@@ -1,5 +1,5 @@
-import { CancelLineMutedButton, CheckCircleLineButton } from '@dmp/ui';
-import DialogPanel from './dialog.Panel';
+import { Button } from '../../ui/Button';
+import DialogPanel from './panel';
 import type {
   ConfirmAlertButtonSlotProps,
   ConfirmAlertDialogProps,
@@ -7,7 +7,7 @@ import type {
   ConfirmAlertPanelSlotProps,
   ConfirmAlertTextSlotProps,
   DialogActionHandler,
-} from './dialog.types';
+} from './types';
 
 const DefaultPanel: React.FC<ConfirmAlertPanelSlotProps> = ({ children, className, onClose }) => {
   return (
@@ -32,15 +32,23 @@ const DefaultDescription: React.FC<ConfirmAlertTextSlotProps> = ({ children, cla
 };
 
 const DefaultActions: React.FC<{ children?: React.ReactNode; className?: string }> = ({ children, className }) => {
-  return <div className={className ?? 'flex justify-end mt-6 gap-1'}>{children}</div>;
+  return <div className={className ?? 'mt-6 flex justify-end gap-2'}>{children}</div>;
 };
 
 const DefaultCancelButton: React.FC<ConfirmAlertButtonSlotProps> = ({ children, ...props }) => {
-  return <CancelLineMutedButton {...props}>{children}</CancelLineMutedButton>;
+  return (
+    <Button intent="ghost" variant="outline" size="sm" {...props}>
+      {children}
+    </Button>
+  );
 };
 
 const DefaultOkButton: React.FC<ConfirmAlertButtonSlotProps> = ({ children, ...props }) => {
-  return <CheckCircleLineButton {...props}>{children}</CheckCircleLineButton>;
+  return (
+    <Button intent="primary" variant="solid" size="sm" {...props}>
+      {children}
+    </Button>
+  );
 };
 
 const mergeUi = (providerUi?: ConfirmAlertDialogUI, propsUi?: ConfirmAlertDialogUI): ConfirmAlertDialogUI => ({

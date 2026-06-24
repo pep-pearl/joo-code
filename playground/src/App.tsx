@@ -1,20 +1,56 @@
 import { useEffect, useState } from "react";
 import {
+  DialogPanel,
+  DialogProvider,
   apiMap,
   formatCommaNumber,
   formatThousandToEok,
   initViewportHeight,
+  parseDownloadResponse,
   romanToNumber,
   useDebouncedValue,
+  useConfirmAlertDialogStore,
+  useDialogStore,
   usePages,
   usePaginationButtonsAttrs,
 } from "../../src";
+import { Button } from "../../src/ui/Button";
+
+declare module "../../src/react/dialog" {
+  interface AppDialogPropMap {
+    "playground-dialog": { message: string };
+  }
+}
+
+function PlaygroundDialog({
+  message,
+  close,
+}: {
+  message: string;
+  close: () => void;
+}) {
+  return (
+    <DialogPanel>
+      <DialogPanel.Title>일반 Dialog</DialogPanel.Title>
+      <DialogPanel.Description>{message}</DialogPanel.Description>
+      <div className="mt-6 flex justify-end">
+        <Button size="sm" onClick={close}>
+          확인
+        </Button>
+      </div>
+    </DialogPanel>
+  );
+}
+
+const dialogMap = { "playground-dialog": PlaygroundDialog };
 
 export function App() {
   const [amount, setAmount] = useState("100000");
   const [roman, setRoman] = useState("XIV");
   const [searchText, setSearchText] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
+  const [dialogResult, setDialogResult] = useState("아직 실행하지 않음");
+  const [downloadResult, setDownloadResult] = useState("아직 파싱하지 않음");
   const debouncedSearchText = useDebouncedValue(searchText, 500);
   const maxPage = 12;
   const pages = usePages({ max: maxPage, offset: 5, current: currentPage });
@@ -27,6 +63,33 @@ export function App() {
 
   const postUpdateEndpoint = apiMap.posts[":postId"].update;
   const postUpdatePath = postUpdateEndpoint.path.replace(":postId", "42");
+
+  const openConfirm = async () => {
+    const result = await useConfirmAlertDialogStore.getState().confirm({
+      title: "변경사항을 저장할까요?",
+      description: "확인을 누르면 Promise가 true로 완료됩니다.",
+    });
+    setDialogResult(`confirm: ${result}`);
+  };
+
+  const openAlert = async () => {
+    const result = await useConfirmAlertDialogStore.getState().alert({
+      title: "작업 완료",
+      description: "alert도 동일한 Provider에서 렌더링됩니다.",
+    });
+    setDialogResult(`alert: ${result}`);
+  };
+
+  const parseSampleDownload = async () => {
+    const response = new Response(["id,name\n1,example"], {
+      headers: {
+        "Content-Disposition": 'attachment; filename="report.csv"',
+        "Content-Type": "text/csv",
+      },
+    });
+    const { blob, filename } = await parseDownloadResponse(response);
+    setDownloadResult(`${filename} · ${blob.size} bytes`);
+  };
 
   useEffect(() => initViewportHeight(), []);
 
@@ -167,7 +230,40 @@ export function App() {
             </div>
           </dl>
         </article>
+
+        <article className="card">
+          <h2>Dialog</h2>
+          <p>전역 store에서 일반 dialog, confirm, alert를 열고 Promise 결과를 확인합니다.</p>
+          <div className="dialog-actions">
+            <Button onClick={() => void openConfirm()}>Confirm</Button>
+            <Button intent="success" onClick={() => void openAlert()}>
+              Alert
+            </Button>
+            <Button
+              intent="ghost"
+              variant="outline"
+              onClick={() =>
+                useDialogStore.getState().open("playground-dialog", {
+                  message: "dialogMap에 등록한 컴포넌트를 key로 열었습니다.",
+                })
+              }
+            >
+              일반 Dialog
+            </Button>
+          </div>
+          <p className="result">최근 결과: {dialogResult}</p>
+        </article>
+
+        <article className="card">
+          <h2>API Parser</h2>
+          <p>가상 다운로드 응답에서 Blob과 Content-Disposition 파일명을 추출합니다.</p>
+          <div className="dialog-actions">
+            <Button onClick={() => void parseSampleDownload()}>응답 파싱</Button>
+          </div>
+          <p className="result">결과: {downloadResult}</p>
+        </article>
       </section>
+      <DialogProvider dialogMap={dialogMap} fallback={null} />
     </main>
   );
 }

@@ -1,8 +1,7 @@
-import CloseIcon from '@dmp/assets/svgs/close_24dp_1F1F1F_FILL1_wght700_GRAD0_opsz24.svg?react';
 import { DialogPanel } from '@headlessui/react';
 import clsx from 'clsx';
 import type { ComponentProps, FC, ReactNode } from 'react';
-import { useDialogStore } from '../dialog.stores';
+import { useDialogStore } from '../stores';
 
 /**
  * 다이얼로그 패널 wrapper
@@ -45,24 +44,36 @@ const Wrap: FC<
   return (
     <DialogPanel
       className={clsx(
-        'relative max-w-7/8 max-h-[calc(100vh-80px)] lg:min-w-sm bg-background p-6 lg:p-8 rounded-2xl',
-        'flex flex-col border border-foreground-subtle',
+        'relative flex max-h-[calc(100vh-5rem)] w-[min(32rem,calc(100vw-2rem))] flex-col',
+        'rounded-2xl border border-slate-200 bg-white p-6 text-slate-900 shadow-2xl',
         className,
       )}
       {...props}
     >
-      <div className={clsx('overflow-auto grow pr-4 -mr-4 flex flex-col gap-4', bodyClassName)}>
+      <div className={clsx('flex grow flex-col gap-4 overflow-auto pr-4 -mr-4', bodyClassName)}>
         {showCloseButton && (
           <button
             className={clsx(
-              'absolute right-4 top-4 lg:right-8 lg:top-8 size-4 flex-center-center text-foreground-subtle',
+              'absolute right-4 top-4 grid size-8 place-items-center rounded-full text-slate-500',
+              'transition-colors hover:bg-slate-100 hover:text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-500',
               closeButtonClassName,
             )}
             type="button"
             onClick={handleClose}
             aria-label={closeLabel}
           >
-            {closeIcon ?? <CloseIcon className="size-5" />}
+            {closeIcon ?? (
+              <svg
+                aria-hidden="true"
+                viewBox="0 0 24 24"
+                className="size-5"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+              >
+                <path d="M6 6l12 12M18 6 6 18" strokeLinecap="round" />
+              </svg>
+            )}
           </button>
         )}
         <>{children}</>

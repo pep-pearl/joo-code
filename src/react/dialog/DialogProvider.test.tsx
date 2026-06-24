@@ -1,15 +1,18 @@
+// @vitest-environment jsdom
+
+import '@testing-library/jest-dom/vitest';
 import { act, render, screen, waitFor } from '@testing-library/react';
 import React from 'react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import DialogProvider from './dialog.DialogProvider';
-import { useConfirmAlertDialogStore, useDialogStore } from './dialog.stores';
+import DialogProvider from './DialogProvider';
+import { useConfirmAlertDialogStore, useDialogStore } from './stores';
 
 /**
  * ConfirmAlertDialog를 간이 컴포넌트로 모킹
  * - Provider가 넘겨주는 props를 그대로 표시/사용만 한다.
  * - 버튼 클릭 시 close()를 호출해 닫히도록 구현.
  */
-vi.mock('./dialog.ConfirmAlertDialog', () => {
+vi.mock('./ConfirmAlertDialog', () => {
   const Mock: React.FC<any> = ({ props }: any) => {
     return (
       <div data-testid="confirm-alert">

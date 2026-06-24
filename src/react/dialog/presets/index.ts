@@ -10,4 +10,4 @@ export {
   type BottomConfig,
   type ButtonProps,
   type BottomConfigs,
-} from './presets.modeDialogPanel';
+} from './mode-dialog-panel';

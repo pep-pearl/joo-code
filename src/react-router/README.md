@@ -5,7 +5,7 @@ React Router에 의존하는 코드입니다. React 전용 코드와 분리해 �
 | 항목 | 용도 | 파일 | 의존성 |
 | --- | --- | --- | --- |
 | `useCurrentRoute` | 현재 활성 라우트와 계층 조회 | `useCurrentRoute.ts` | `react`, `react-router` |
-| `RouteMeta`, `RouteObjectWithMeta` | 라우트에 메뉴·제목 메타데이터 추가 | `routeMeta.ts` | `react-router` |
+| `RouteMeta`, `RouteObjectWithMeta` | 라우트에 메뉴·제목 메타데이터 추가 | `route-meta.ts` | `react-router` |
 
 ```tsx
 const { route, tree } = useCurrentRoute(routes);

@@ -1,8 +1,8 @@
-import Description from './dialog.Panel.Description';
-import Form from './dialog.Panel.Form';
-import FormWithProvider from './dialog.Panel.FormWithProvider';
-import Title from './dialog.Panel.Title';
-import Wrap from './dialog.Panel.Wrap';
+import Description from './Description';
+import Form from './Form';
+import FormWithProvider from './FormWithProvider';
+import Title from './Title';
+import Wrap from './Wrap';
 
 export type DialogPanel = typeof Wrap & {
   Title: typeof Title;

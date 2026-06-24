@@ -1,4 +1,4 @@
-import type { BOTTOM_MODE_MAP } from './modeDialogPanel.constants';
+import type { BOTTOM_MODE_MAP } from './constants';
 
 export interface ButtonProps {
   type?: 'button' | 'submit';

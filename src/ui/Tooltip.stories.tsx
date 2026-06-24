@@ -4,18 +4,61 @@ import { Tooltip } from "./Tooltip";
 const meta = {
   title: "UI/Tooltip",
   component: Tooltip,
-  parameters: { layout: "centered" },
+  subcomponents: {
+    Trigger: Tooltip.Trigger,
+    Content: Tooltip.Content,
+  },
+  tags: ["autodocs"],
+  parameters: {
+    layout: "centered",
+    docs: {
+      description: {
+        component:
+          "hover 또는 click으로 열 수 있는 compound Tooltip입니다. Trigger가 상호작용을 담당하고 Content는 document.body portal에 렌더링됩니다.",
+      },
+    },
+  },
   argTypes: {
     type: {
       control: "radio",
       options: ["hover", "click"],
+      description: "Tooltip을 여는 사용자 상호작용 방식입니다.",
+      table: {
+        category: "Behavior",
+        type: { summary: '"hover" | "click"' },
+        defaultValue: { summary: "hover" },
+      },
     },
     keepOpenOnContentHover: {
       control: "boolean",
+      description: "hover형 Tooltip에서 Content로 포인터가 이동해도 열린 상태를 유지합니다.",
+      table: {
+        category: "Behavior",
+        defaultValue: { summary: "false" },
+      },
     },
     positionAnchor: {
       control: "radio",
       options: ["trigger", "pointer"],
+      description: "Content 위치를 Trigger 요소 또는 포인터 좌표를 기준으로 계산합니다.",
+      table: {
+        category: "Position",
+        type: { summary: '"trigger" | "pointer"' },
+        defaultValue: { summary: "trigger" },
+      },
+    },
+    children: {
+      control: false,
+      description: "Tooltip.Trigger와 Tooltip.Content를 배치합니다.",
+      table: {
+        category: "Content",
+        type: { summary: "React.ReactNode" },
+      },
+    },
+    className: {
+      control: false,
+      description: "Tooltip wrapper에 추가할 className입니다.",
+      table: { category: "HTML attributes" },
     },
   },
   args: {

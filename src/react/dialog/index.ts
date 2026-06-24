@@ -1,10 +1,10 @@
 export interface AppDialogPropMap {}
 
-export type * from './dialog.types';
+export type * from './types';
 
-export { default as ConfirmAlertDialog } from './dialog.ConfirmAlertDialog';
-export { default as DialogProvider } from './dialog.DialogProvider';
-export { default as DialogPanel } from './dialog.Panel';
+export { default as ConfirmAlertDialog } from './ConfirmAlertDialog';
+export { default as DialogProvider } from './DialogProvider';
+export { default as DialogPanel } from './panel';
 export {
   BOTTOM_MODE_MAP,
   CancelButton,
@@ -17,6 +17,6 @@ export {
   type BottomConfig,
   type BottomConfigs,
   type ButtonProps,
-} from './dialog.presets';
+} from './presets';
 
-export { useConfirmAlertDialogStore, useDialogStore } from './dialog.stores';
+export { useConfirmAlertDialogStore, useDialogStore } from './stores';

@@ -9,6 +9,7 @@ React 화면에서 재사용하는 UI 컴포넌트와 공통 타입·스타일 �
 | `Button` | 사용자 액션 실행 | `Button.tsx` | React, Headless UI, CVA |
 | `Badge` | 상태·분류·짧은 정보 표시 | `Badge.tsx` | React, CVA |
 | `GridLayout` | 열·행과 아이템 배치를 조합하는 CSS Grid 레이아웃 | `GridLayout.tsx` | React, Tailwind CSS |
+| `Tooltip` | hover·click과 trigger·pointer 위치를 지원하는 툴팁 | `Tooltip/` | React DOM |
 | `PolymorphicProps` | `as` prop을 지원하는 컴포넌트 타입 | `types.ts` | React |
 | `cn` | 조건부 class와 Tailwind class 병합 | `utils.ts` | clsx, tailwind-merge |
 | 공통 스타일 | Tailwind CSS 불러오기 | `global.css` | Tailwind CSS |
@@ -122,7 +123,7 @@ export function Dashboard() {
 npm run storybook
 ```
 
-브라우저에서 `http://localhost:6006`을 열면 Button과 Badge의 상태별 스타일, GridLayout의 span·시작 위치·dense 배치와 대시보드 예제를 확인할 수 있습니다. 스토리 파일의 `autodocs` 설정으로 props 문서도 함께 생성됩니다.
+브라우저에서 `http://localhost:6006`을 열면 Button과 Badge의 상태별 스타일, GridLayout의 span·시작 위치·dense 배치와 대시보드 예제, Tooltip의 hover·click·pointer 위치를 확인할 수 있습니다. 각 스토리의 `autodocs` 설정으로 props 문서도 함께 생성됩니다.
 
 정적 Storybook 빌드를 확인하려면 다음 명령을 실행합니다.
 

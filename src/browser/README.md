@@ -4,7 +4,7 @@
 
 | 함수 | 용도 | 파일 |
 | --- | --- | --- |
-| `initViewportHeight` | 모바일 주소창 변화에 맞춰 `--vh` 갱신 | `initViewportHeight.ts` |
+| `initViewportHeight` | 모바일 주소창 변화에 맞춰 `--vh` 갱신 | `init-viewport-height.ts` |
 
 ```ts
 const cleanup = initViewportHeight();

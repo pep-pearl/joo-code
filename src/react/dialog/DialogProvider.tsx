@@ -1,13 +1,12 @@
 import { Dialog } from '@headlessui/react';
-import type { LoadableComponent } from '@loadable/component';
 import clsx from 'clsx';
 import { Suspense } from 'react';
-import ConfirmAlertDialog from './dialog.ConfirmAlertDialog';
-import { useConfirmAlertDialogStore, useDialogStore } from './dialog.stores';
-import type { DialogBackdropSlotProps, DialogProviderUI } from './dialog.types';
+import ConfirmAlertDialog from './ConfirmAlertDialog';
+import { useConfirmAlertDialogStore, useDialogStore } from './stores';
+import type { DialogBackdropSlotProps, DialogProviderUI } from './types';
 
 export interface DialogProviderProps {
-  dialogMap: Record<string, React.ComponentType<any> | LoadableComponent<any>>;
+  dialogMap: Record<string, React.ComponentType<any>>;
   fallback?: React.ReactNode;
   /** Backdrop/confirm-alert 버튼/패널 등 UI 교체용 설정. 미지정 시 기본 UI 사용 */
   ui?: DialogProviderUI;

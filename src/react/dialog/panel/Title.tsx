@@ -9,7 +9,7 @@ import type { ComponentProps, FC } from 'react';
  */
 const Title: FC<ComponentProps<typeof DialogTitle>> = ({ className, children, ...props }) => {
   return (
-    <DialogTitle className={clsx('text-sm lg:text-base font-semibold', className)} {...props}>
+    <DialogTitle className={clsx('pr-10 text-base font-semibold text-slate-900', className)} {...props}>
       {children}
     </DialogTitle>
   );

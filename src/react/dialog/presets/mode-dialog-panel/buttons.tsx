@@ -1,17 +1,13 @@
-import {
-  CancelLineMutedButton,
-  CheckCircleLineButton,
-  DeleteLineButton,
-  EditLineButton,
-  RiskStepApplyButton,
-} from '@dmp/ui';
-import { useDialogStore } from '../../dialog.stores';
-import type { ButtonProps } from './modeDialogPanel.types';
+import { Button } from '../../../../ui/Button';
+import { useDialogStore } from '../../stores';
+import type { ButtonProps } from './types';
 
 const EditButton: React.FC<ButtonProps> = ({ type = 'button', title = '수정', clickCb, close }) => {
   const ensureClose = useDialogStore(s => s.close);
   return (
-    <EditLineButton
+    <Button
+      intent="primary"
+      variant="outline"
       title={title}
       type={type}
       onClick={() => {
@@ -20,14 +16,16 @@ const EditButton: React.FC<ButtonProps> = ({ type = 'button', title = '수정', 
       }}
     >
       {title}
-    </EditLineButton>
+    </Button>
   );
 };
 
 const DeleteButton: React.FC<ButtonProps> = ({ type = 'button', clickCb, title = '삭제', close }) => {
   const ensureClose = useDialogStore(s => s.close);
   return (
-    <DeleteLineButton
+    <Button
+      intent="danger"
+      variant="solid"
       type={type}
       onClick={() => {
         clickCb?.();
@@ -35,14 +33,16 @@ const DeleteButton: React.FC<ButtonProps> = ({ type = 'button', clickCb, title =
       }}
     >
       {title}
-    </DeleteLineButton>
+    </Button>
   );
 };
 
 const SaveButton: React.FC<ButtonProps> = ({ type = 'submit', clickCb, title = '저장', close }) => {
   const ensureClose = useDialogStore(s => s.close);
   return (
-    <CheckCircleLineButton
+    <Button
+      intent="primary"
+      variant="solid"
       title={title}
       type={type}
       onClick={() => {
@@ -51,14 +51,16 @@ const SaveButton: React.FC<ButtonProps> = ({ type = 'submit', clickCb, title = '
       }}
     >
       {title}
-    </CheckCircleLineButton>
+    </Button>
   );
 };
 
 const OkButton: React.FC<ButtonProps> = ({ type = 'submit', clickCb, title = '확인', close }) => {
   const ensureClose = useDialogStore(s => s.close);
   return (
-    <CheckCircleLineButton
+    <Button
+      intent="primary"
+      variant="solid"
       title={title}
       type={type}
       onClick={() => {
@@ -67,14 +69,16 @@ const OkButton: React.FC<ButtonProps> = ({ type = 'submit', clickCb, title = '�
       }}
     >
       {title}
-    </CheckCircleLineButton>
+    </Button>
   );
 };
 
 const CancelButton: React.FC<ButtonProps> = ({ type = 'button', clickCb, title, close }) => {
   const ensureClose = useDialogStore(s => s.close);
   return (
-    <CancelLineMutedButton
+    <Button
+      intent="ghost"
+      variant="outline"
       title={title}
       type={type}
       onClick={() => {
@@ -83,14 +87,16 @@ const CancelButton: React.FC<ButtonProps> = ({ type = 'button', clickCb, title, 
       }}
     >
       {title}
-    </CancelLineMutedButton>
+    </Button>
   );
 };
 
 const RiskApplyButton: React.FC<ButtonProps> = ({ type = 'submit', clickCb, title = '위기단계 적용', close }) => {
   const ensureClose = useDialogStore(s => s.close);
   return (
-    <RiskStepApplyButton
+    <Button
+      intent="warning"
+      variant="solid"
       title={title}
       type={type}
       onClick={() => {
@@ -99,7 +105,7 @@ const RiskApplyButton: React.FC<ButtonProps> = ({ type = 'submit', clickCb, titl
       }}
     >
       {title}
-    </RiskStepApplyButton>
+    </Button>
   );
 };
 

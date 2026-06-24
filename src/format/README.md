@@ -4,9 +4,9 @@
 
 | 함수 | 용도 | 파일 |
 | --- | --- | --- |
-| `formatCommaNumber` | 숫자에 천 단위 콤마 추가 | `formatCommaNumber.ts` |
-| `formatThousandToEok` | 천원 단위를 억원 단위로 변환 | `formatThousandToEok.ts` |
-| `romanToNumber` | 로마 숫자를 일반 숫자로 변환 | `romanToNumber.ts` |
+| `formatCommaNumber` | 숫자에 천 단위 콤마 추가 | `format-comma-number.ts` |
+| `formatThousandToEok` | 천원 단위를 억원 단위로 변환 | `format-thousand-to-eok.ts` |
+| `romanToNumber` | 로마 숫자를 일반 숫자로 변환 | `roman-to-number.ts` |
 
 ## 복사
 

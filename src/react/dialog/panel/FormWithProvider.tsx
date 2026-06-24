@@ -1,5 +1,5 @@
 import { FormProvider, type FieldValues, type UseFormReturn } from 'react-hook-form';
-import Form from './dialog.Panel.Form';
+import Form from './Form';
 
 type FormWithProviderProps<T extends FieldValues> = React.FormHTMLAttributes<HTMLFormElement> & {
   methods: UseFormReturn<T>;

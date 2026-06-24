@@ -1,1 +1,1 @@
-export * from "./initViewportHeight";
+export * from "./init-viewport-height";

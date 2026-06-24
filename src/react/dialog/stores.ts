@@ -1,15 +1,15 @@
-import type { LoadableComponent } from '@loadable/component';
 import type { ComponentType } from 'react';
 import { create } from 'zustand';
+import { createDeferred } from '../../promise/create-deferred';
 import type {
   AlertDialogProps,
   ConfirmAlertDialogConfig,
   ConfirmAlertDialogProps,
   ConfirmDialogProps,
-} from './dialog.types';
+} from './types';
 import type { AppDialogPropMap } from './index';
 
-export type ComponentLike = ComponentType<any> | LoadableComponent<any>;
+export type ComponentLike = ComponentType<any>;
 
 type DialogKey = Extract<keyof AppDialogPropMap, string>;
 
@@ -72,13 +72,12 @@ export const useConfirmAlertDialogStore = create<ConfirmAlertDialogStore>()((set
     props.close();
   },
   confirm: (props, config) =>
-    new Promise<boolean>(resolve => {
+    (() => {
       const { okDialogClose } = getConfig(config);
-      let settled = false;
+      const deferred = createDeferred<boolean>();
 
       const settle = (result: boolean, callback?: () => void) => {
-        if (settled) return;
-        settled = true;
+        if (!deferred.resolve(result)) return;
 
         callback?.();
         get().close();
@@ -86,7 +85,6 @@ export const useConfirmAlertDialogStore = create<ConfirmAlertDialogStore>()((set
         // 확인 시 기존 일반 다이얼로그도 닫기
         if (result && okDialogClose) useDialogStore.getState().close();
 
-        resolve(result);
       };
 
       get().open({
@@ -96,15 +94,16 @@ export const useConfirmAlertDialogStore = create<ConfirmAlertDialogStore>()((set
         onCancel: () => settle(false, props.onCancel),
         type: 'confirm',
       });
-    }),
+
+      return deferred.promise;
+    })(),
   alert: (props, config) =>
-    new Promise<boolean>(resolve => {
+    (() => {
       const { okDialogClose, dismissResult } = getConfig(config);
-      let settled = false;
+      const deferred = createDeferred<boolean>();
 
       const settle = (result: boolean, callback?: () => void) => {
-        if (settled) return;
-        settled = true;
+        if (!deferred.resolve(result)) return;
 
         callback?.();
         get().close();
@@ -112,7 +111,6 @@ export const useConfirmAlertDialogStore = create<ConfirmAlertDialogStore>()((set
         // 확인 시 기존 일반 다이얼로그도 닫기
         if (result && okDialogClose) useDialogStore.getState().close();
 
-        resolve(result);
       };
 
       get().open({
@@ -121,5 +119,7 @@ export const useConfirmAlertDialogStore = create<ConfirmAlertDialogStore>()((set
         onOk: () => settle(true, props.onOk),
         type: 'alert',
       });
-    }),
+
+      return deferred.promise;
+    })(),
 }));

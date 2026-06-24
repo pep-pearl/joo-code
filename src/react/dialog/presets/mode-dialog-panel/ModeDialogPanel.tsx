@@ -1,7 +1,7 @@
 import type { FieldValues, UseFormReturn } from 'react-hook-form';
-import DialogPanel from '../../dialog.Panel';
-import { BOTTOM_MODE_MAP } from './modeDialogPanel.constants';
-import type { BottomConfig, BottomConfigs } from './modeDialogPanel.types';
+import DialogPanel from '../../panel';
+import { BOTTOM_MODE_MAP } from './constants';
+import type { BottomConfig, BottomConfigs } from './types';
 
 interface ModeDialogPanelProps<M extends string = string, T extends FieldValues = FieldValues> {
   title?: string;
@@ -26,7 +26,7 @@ const ModeDialogPanel = <M extends string = string, T extends FieldValues = Fiel
   const titleNode = title && <DialogPanel.Title>{title}</DialogPanel.Title>;
 
   const bottomNode = bottomConfigs && (
-    <div className="flex justify-end mt-6 gap-1">
+    <div className="mt-6 flex justify-end gap-2">
       {bottomConfigs[mode].map(({ key, ...props }) => {
         const Comp = BOTTOM_MODE_MAP[key];
         return <Comp key={key} {...props} />;
