@@ -1,17 +1,82 @@
 import {
-  TooltipContext,
-  type TooltipActionPoint,
-  type TooltipPositionAnchor,
-  type TooltipType,
-} from "./context";
-import {
-  type ReactNode,
+  createContext,
   useCallback,
+  useContext,
   useEffect,
   useId,
   useRef,
   useState,
+  type MutableRefObject,
+  type ReactNode,
 } from "react";
+
+export type TooltipType = "hover" | "click";
+export type TooltipPositionAnchor = "trigger" | "pointer";
+
+export type TooltipActionPoint = {
+  x: number;
+  y: number;
+};
+
+type TooltipContextValue = {
+  type: TooltipType;
+  isOpen: boolean;
+  contentId: string;
+  triggerRef: MutableRefObject<HTMLDivElement | null>;
+  contentRef: MutableRefObject<HTMLDivElement | null>;
+  actionPointRef: MutableRefObject<TooltipActionPoint | null>;
+  keepOpenOnContentHover: boolean;
+  positionAnchor: TooltipPositionAnchor;
+  setActionPoint: (point: TooltipActionPoint | null) => void;
+  open: () => void;
+  close: () => void;
+  toggle: () => void;
+  scheduleClose: () => void;
+};
+
+export const TooltipContext = createContext<TooltipContextValue | null>(null);
+
+export function useTooltipContext() {
+  const context = useContext(TooltipContext);
+  if (context === null) {
+    throw new Error("useTooltipContext must be used within a Tooltip");
+  }
+  return context;
+}
+
+export function useTooltipActionContext() {
+  const {
+    type,
+    open,
+    close,
+    toggle,
+    scheduleClose,
+    triggerRef,
+    contentRef,
+    actionPointRef,
+    keepOpenOnContentHover,
+    positionAnchor,
+    setActionPoint,
+    contentId,
+    isOpen,
+  } = useTooltipContext();
+
+  return {
+    type,
+    open,
+    close,
+    toggle,
+    scheduleClose,
+    triggerRef,
+    contentRef,
+    actionPointRef,
+    keepOpenOnContentHover,
+    positionAnchor,
+    setActionPoint,
+    contentId,
+    isOpen,
+  };
+}
 
 export function TooltipContextProvider({
   children,

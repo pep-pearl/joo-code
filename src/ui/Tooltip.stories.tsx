@@ -31,7 +31,8 @@ const meta = {
     },
     keepOpenOnContentHover: {
       control: "boolean",
-      description: "hover형 Tooltip에서 Content로 포인터가 이동해도 열린 상태를 유지합니다.",
+      description:
+        "hover형 Tooltip에서 Content로 포인터가 이동해도 열린 상태를 유지합니다.",
       table: {
         category: "Behavior",
         defaultValue: { summary: "false" },
@@ -40,7 +41,8 @@ const meta = {
     positionAnchor: {
       control: "radio",
       options: ["trigger", "pointer"],
-      description: "Content 위치를 Trigger 요소 또는 포인터 좌표를 기준으로 계산합니다.",
+      description:
+        "Content 위치를 Trigger 요소 또는 포인터 좌표를 기준으로 계산합니다.",
       table: {
         category: "Position",
         type: { summary: '"trigger" | "pointer"' },
