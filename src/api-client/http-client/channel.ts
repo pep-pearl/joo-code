@@ -4,7 +4,21 @@ const TOKEN_UPDATED = "token-updated";
 const REFRESH_START = "refresh-start";
 const REFRESH_END = "refresh-end";
 
+type AuthChannelMessage = {
+  at?: number;
+  type: typeof TOKEN_UPDATED | typeof REFRESH_START | typeof REFRESH_END;
+};
+
 const hasWindow = () => typeof window !== "undefined";
+
+const isAuthChannelMessage = (value: unknown): value is AuthChannelMessage => {
+  if (!value || typeof value !== "object") {
+    return false;
+  }
+
+  const type = (value as Partial<AuthChannelMessage>).type;
+  return type === TOKEN_UPDATED || type === REFRESH_START || type === REFRESH_END;
+};
 
 export class AuthChannel {
   private channel: BroadcastChannel | null = null;
@@ -19,17 +33,28 @@ export class AuthChannel {
     this.channel = new BroadcastChannel(AUTH_CHANNEL);
     this.channel.onmessage = (ev) => {
       const msg = ev?.data;
-      if (msg?.type === TOKEN_UPDATED)
+
+      if (!isAuthChannelMessage(msg)) {
+        return;
+      }
+
+      if (msg.type === TOKEN_UPDATED) {
         this.lastTokenSignalAt = Math.max(
           this.lastTokenSignalAt,
           msg.at ?? Date.now(),
         );
-      if (msg?.type === REFRESH_START)
+      }
+
+      if (msg.type === REFRESH_START) {
         this.lastRefreshStartAt = Math.max(
           this.lastRefreshStartAt,
           msg.at ?? Date.now(),
         );
-      if (msg?.type === REFRESH_END) this.clearRefreshLock();
+      }
+
+      if (msg.type === REFRESH_END) {
+        this.clearRefreshLock();
+      }
     };
   }
 
@@ -45,9 +70,8 @@ export class AuthChannel {
     this.lastRefreshStartAt = 0;
   }
 
-  private postMessage(data: any) {
-    const at = Date.now();
-    this.channel?.postMessage({ at, ...data });
+  private postMessage(data: Pick<AuthChannelMessage, "type">) {
+    this.channel?.postMessage({ at: Date.now(), ...data });
   }
 
   postTokenUpdated() {

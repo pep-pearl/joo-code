@@ -1,13 +1,20 @@
 node_modules/
 dist/
 coverage/
+.pnpm-store/
 *.log
 *.zip
 .DS_Store
 
-# 임시
-temp/
-api-slot-kit/
+.env
+.env.*
+!.env.example
 
+# Storybook build output
+storybook-static/
 *storybook.log
-storybook-static
+
+# 작업/실험 폴더
+.superpowers/
+docs/superpowers/
+src/api-slot-kit/

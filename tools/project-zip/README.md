@@ -8,7 +8,7 @@ Linux, macOS, Windows에서 같은 명령을 사용하며 별도 ZIP 프로그�
 프로젝트 루트에서 실행합니다.
 
 ```bash
-npm run zip
+pnpm zip
 ```
 
 기본 결과는 프로젝트 폴더의 한 단계 위에 생성됩니다.
@@ -20,7 +20,7 @@ npm run zip
 출력 위치를 직접 정할 수도 있습니다.
 
 ```bash
-npm run zip -- --output ./backup/joo-code.zip
+pnpm zip -- --output ./backup/joo-code.zip
 ```
 
 ## 다른 프로젝트에 복사해서 사용
@@ -39,8 +39,10 @@ node ./zip-project.mjs --source ../my-project --output ../my-project.zip
 
 ## 기본 제외 항목
 
-- `.git`, `node_modules`
+- `.git`, `node_modules`, `.pnpm-store`
 - `dist`, `coverage`, `.next`, `.turbo`, `.cache`, `.vite`
+- `storybook-static`
+- `.superpowers`, `temp`, `api-slot-kit`
 - `*.zip`, `*.log`
 - `.env`, `.env.*` (`.env.example`은 포함)
 

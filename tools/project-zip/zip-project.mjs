@@ -11,15 +11,20 @@ const EXCLUDED_DIRECTORIES = new Set([
   ".next",
   ".turbo",
   ".vite",
+  ".superpowers",
+  ".pnpm-store",
   "coverage",
   "dist",
   "node_modules",
+  "storybook-static",
+  "temp",
+  "api-slot-kit",
 ]);
 
 const CRC_TABLE = createCrcTable();
 
 function printHelp() {
-  console.log(`joo-code project zip\n\nUsage:\n  node zip-project.mjs [--source <directory>] [--output <file.zip>]\n\nDefaults:\n  --source  current working directory\n  --output  ../<project-name>.zip\n\nExamples:\n  npm run zip\n  npm run zip -- --output ./backup/joo-code.zip\n  node zip-project.mjs --source ../my-project --output ../my-project.zip`);
+  console.log(`joo-code project zip\n\nUsage:\n  node zip-project.mjs [--source <directory>] [--output <file.zip>]\n\nDefaults:\n  --source  current working directory\n  --output  ../<project-name>.zip\n\nExamples:\n  pnpm zip\n  pnpm zip -- --output ./backup/joo-code.zip\n  node zip-project.mjs --source ../my-project --output ../my-project.zip`);
 }
 
 function parseArguments(args) {

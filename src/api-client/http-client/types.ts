@@ -1,20 +1,8 @@
-/*
- * @ai-purpose API client 설정, 요청 옵션, 응답 method contract 타입을 정의한다.
- * @ai-entry false
- * @ai-domain api, shared, types
- * @ai-depends ../api-error, ../types
- * @ai-used-by createApiClient, request, refresh, storage helpers
- * @ai-keywords ApiClientConfig, ApiClientOptions, AuthMode, RefreshTokenTransport, TokenStorage
- */
-
 import { ApiError } from "../api-error";
-import type { ApiResponse } from "../types";
+import type { ApiMeta, ApiResponse } from "../types";
 
 /**
- * URL 쿼리 파라미터 값으로 사용할 수 있는 타입입니다.
- *
- * - 배열 값은 같은 key를 여러 번 append합니다.
- * - `null`과 `undefined`는 URL에 포함하지 않습니다.
+ * 쿼리 파라미터
  */
 export type QueryParamValue =
   | string
@@ -23,48 +11,31 @@ export type QueryParamValue =
   | Array<string | number | boolean>
   | null
   | undefined;
-
-/**
- * 요청 URL에 붙일 쿼리 파라미터 객체입니다.
- */
 export type QueryParams = Record<string, QueryParamValue>;
 
 /**
- * API 클라이언트가 요청에 인증 정보를 싣는 방식입니다.
- *
- * - `cookie`: production 권장 방식입니다. HttpOnly/Secure cookie를 `credentials: "include"`로 전달합니다.
- * - `localStorage`: development 편의용 방식입니다. 저장된 access token을 `Authorization: Bearer` 헤더로 전달합니다.
+ * 인증 방식
+ * - cookie: production 권장. HttpOnly/Secure cookie 기반 인증.
+ * - localStorage: development 편의용. Authorization Bearer 헤더 기반 인증.
  */
 export type AuthMode = "cookie" | "localStorage";
 
 /**
- * access token refresh 요청에서 refresh token을 전달하는 방식입니다.
- *
- * - `cookie`: refresh token이 HttpOnly cookie에 있고 `credentials: "include"`로 전달합니다.
- * - `body`: `TokenStorage`에서 refresh token을 읽어 JSON body에 담습니다.
- * - `none`: refresh 요청에 별도 refresh token을 싣지 않습니다.
+ * refresh token 전달 방식
+ * - cookie: refresh token이 HttpOnly cookie에 있고 credentials include로 전달
+ * - body: refresh token을 storage에서 꺼내 body.refresh_token으로 전달
+ * - none: refresh 요청에 별도 refresh token을 싣지 않음
  */
 export type RefreshTokenTransport = "cookie" | "body" | "none";
 
-/**
- * access token과 refresh token을 읽고 쓰는 storage contract입니다.
- */
 export type TokenStorage = {
   getItem: (key: string) => string | null;
   setItem: (key: string, value: string) => void;
   removeItem: (key: string) => void;
 };
 
-/**
- * API 클라이언트에 주입할 수 있는 fetch 구현체 타입입니다.
- */
 export type ApiClientFetch = typeof fetch;
 
-/**
- * 인증 API가 반환하는 token payload 구조입니다.
- *
- * @template TUser - token payload에 함께 포함될 사용자 정보 타입입니다.
- */
 export type AuthTokenPayload<TUser = unknown> = {
   access_expires_at?: string;
   access_token?: string;
@@ -74,32 +45,96 @@ export type AuthTokenPayload<TUser = unknown> = {
   user?: TUser;
 };
 
-/**
- * refresh API가 반환하는 기본 응답 타입입니다.
- */
-export type RefreshResponse = ApiResponse<AuthTokenPayload>;
+export type RefreshResponse<
+  TTokenPayload = AuthTokenPayload,
+  TMeta = ApiMeta,
+> = ApiResponse<TTokenPayload, TMeta>;
 
-/**
- * refresh 응답에서 추출한 token 값입니다.
- */
 export type RefreshTokenResult = {
   accessToken?: string;
   refreshToken?: string;
 };
 
+export type ApiClientErrorPhase = "request" | "refresh";
+
 /**
- * API 클라이언트의 공통 동작을 제어하는 설정입니다.
- *
- * - 기본 인증 방식은 cookie mode입니다.
- * - localStorage mode에서는 `tokenStorage`를 주입하지 않으면 브라우저의 `window.localStorage`를 사용합니다.
- * - 서버/테스트/headless 환경에서는 `fetcher`와 `tokenStorage`를 명시적으로 주입할 수 있습니다.
+ * HTTP 응답을 애플리케이션 에러로 변환할 때 전달되는 정보.
+ * 커스텀 Error를 사용하려면 createError를 주입한다.
  */
-export type ApiClientConfig = {
+export type ApiClientErrorContext<TParsedBody = unknown> = {
+  phase: ApiClientErrorPhase;
+  status: number;
+  fallbackMessage: string;
+  code?: string;
+  parsedBody: TParsedBody;
+  response?: Response;
+  method: string;
+  path: string;
+  url: string;
+};
+
+export type ApiClientErrorFactory<TError extends Error = ApiError> = (
+  context: ApiClientErrorContext,
+) => TError;
+
+/**
+ * access token refresh 여부를 외부 정책으로 결정하기 위한 컨텍스트.
+ */
+export type ApiClientShouldRefreshContext<TParsedBody = unknown> = {
+  auth: boolean;
+  status: number;
+  parsedBody: TParsedBody;
+  response: Response;
+  method: string;
+  path: string;
+  refreshPath: string;
+};
+
+export type ApiClientShouldRefresh = (
+  context: ApiClientShouldRefreshContext,
+) => boolean;
+
+export type ApiClientRequestErrorContext = {
+  apiBaseUrl: string;
+  method: string;
+  path: string;
+  url: string;
+};
+
+export type ApiClientRefreshFailureContext = {
+  apiBaseUrl: string;
+  method: "POST";
+  path: string;
+  url: string;
+  /** 현재 클라이언트의 access/refresh token을 제거한다. */
+  clearTokens: () => void;
+};
+
+export type ApiClientErrorCallback<
+  TError extends Error,
+  TContext,
+> = (error: TError | Error, context: TContext) => void | Promise<void>;
+
+/**
+ * API 클라이언트 설정
+ */
+export type ApiClientConfig<TError extends Error = ApiError> = {
   /**
-   * 타임아웃 (ms)
+   * 각 일반 HTTP 요청 시도의 타임아웃 (ms).
+   * refresh 대기 시간은 포함하지 않으며, refresh 후 재시도에는 새 타이머가 적용된다.
    * @default 10000
    */
   timeout?: number;
+  /**
+   * 실제 refresh HTTP 요청의 타임아웃 (ms).
+   * @default timeout
+   */
+  refreshTimeout?: number;
+  /**
+   * 공유 refresh HTTP 요청 자체를 취소할 수 있는 클라이언트 수명주기 signal.
+   * 개별 요청의 signal은 다른 대기자에게 영향을 주지 않도록 refresh 자체에는 연결하지 않는다.
+   */
+  refreshSignal?: AbortSignal;
   /**
    * 인증 방식
    * @default "cookie"
@@ -117,7 +152,7 @@ export type ApiClientConfig = {
   refreshTokenKey?: string;
   /**
    * Access token 갱신 경로
-   * @default "/auth/refresh"
+   * @default "/v1/auth/refresh"
    */
   refreshPath?: string;
   /**
@@ -160,121 +195,136 @@ export type ApiClientConfig = {
    */
   getRefreshTokens?: (body: unknown) => RefreshTokenResult;
   /**
-   * 이 에러 코드일 때만 refresh를 시도한다.
-   * ACCESS_KEY_MISSING / ACCESS_KEY_INVALID 같은 일반 401은 refresh하지 않는다.
+   * 기본 refresh 정책에서 refresh 대상으로 볼 에러 코드.
+   * shouldRefresh를 주입하면 이 값 대신 주입된 정책이 사용된다.
    */
   refreshableErrorCodes?: readonly string[];
   /**
+   * HTTP 오류 응답을 커스텀 Error로 변환한다.
+   * 커스텀 TError를 사용할 때 함께 주입하는 것을 권장한다.
+   */
+  createError?: ApiClientErrorFactory<TError>;
+  /**
+   * refresh 여부를 결정하는 외부 정책. 미지정 시 401 + refreshableErrorCodes를 사용한다.
+   */
+  shouldRefresh?: ApiClientShouldRefresh;
+  /**
+   * 각 논리 요청이 최종 실패했을 때 한 번 호출된다.
+   * 같은 refresh 실패를 기다린 요청이 여러 개면 요청 수만큼 호출될 수 있다.
+   */
+  onRequestError?: ApiClientErrorCallback<
+    TError,
+    ApiClientRequestErrorContext
+  >;
+  /**
+   * 공유 refresh flight가 최종 실패했을 때 flight당 정확히 한 번 호출된다.
+   * 토큰 제거가 필요하면 context.clearTokens()를 명시적으로 호출할 수 있다.
+   */
+  onRefreshFailure?: ApiClientErrorCallback<
+    TError,
+    ApiClientRefreshFailureContext
+  >;
+  /**
+   * API 클라이언트 생성 직후 refresh를 먼저 시도할지 여부.
+   * @default true
+   */
+  refreshOnStart?: boolean;
+  /**
+   * @deprecated 범용 구현에서는 onRefreshFailure를 사용한다.
    * refresh token invalid/expired/reused일 때 호출한다.
    */
   onAuthExpired?: (error: ApiError) => void;
   /**
+   * @deprecated 범용 구현에서는 onRefreshFailure를 사용한다.
    * USER_NOT_APPROVED / USER_INACTIVE일 때 호출한다.
    */
   onUserBlocked?: (error: ApiError) => void;
 };
 
-export type ResolvedApiClientConfig = Required<
-  Omit<
-    ApiClientConfig,
-    | "fetcher"
-    | "getRefreshTokens"
-    | "onAuthExpired"
-    | "onUserBlocked"
-    | "refreshableErrorCodes"
-    | "refreshResponseDataKey"
-    | "tokenStorage"
-  >
-> & {
+export type ResolvedApiClientConfig<TError extends Error = ApiError> = {
+  timeout: number;
+  refreshTimeout: number;
+  refreshSignal?: AbortSignal;
+  authMode: AuthMode;
+  accessTokenKey: string;
+  refreshTokenKey: string;
+  refreshPath: string;
+  refreshTokenTransport: RefreshTokenTransport;
+  tokenStorage?: TokenStorage;
   fetcher: ApiClientFetch;
+  refreshRequestTokenKey: string;
+  refreshResponseDataKey: string | null;
+  accessTokenResponseKey: string;
+  refreshTokenResponseKey: string;
   getRefreshTokens: (body: unknown) => RefreshTokenResult;
   refreshableErrorCodes: readonly string[];
-  refreshResponseDataKey: string | null;
-  tokenStorage?: TokenStorage;
+  createError: ApiClientErrorFactory<TError>;
+  shouldRefresh: ApiClientShouldRefresh;
+  onRequestError?: ApiClientErrorCallback<
+    TError,
+    ApiClientRequestErrorContext
+  >;
+  onRefreshFailure?: ApiClientErrorCallback<
+    TError,
+    ApiClientRefreshFailureContext
+  >;
+  refreshOnStart: boolean;
   onAuthExpired?: (error: ApiError) => void;
   onUserBlocked?: (error: ApiError) => void;
 };
 
 /**
- * 단일 API 요청에 적용할 옵션입니다.
- *
- * - `RequestInit`에서 `body`만 제외하고, typed body와 query params를 추가합니다.
- * - `auth`가 `false`이면 인증 헤더/cookie와 token refresh를 사용하지 않습니다.
- *
- * @template TBody - 요청 body의 타입입니다.
+ * API 클라이언트 옵션
  */
 export type ApiClientOptions<TBody = unknown> = Omit<RequestInit, "body"> & {
   body?: TBody;
   params?: QueryParams;
+  /** 각 HTTP 시도에 적용되는 타임아웃. */
   timeout?: number;
   auth?: boolean;
 };
 
 /**
- * API 클라이언트가 제공하는 HTTP 메서드 contract입니다.
+ * 수동 refresh 호출자의 대기 제어 옵션.
+ * signal/timeout은 공유 refresh HTTP 요청 자체를 취소하지 않고 현재 호출자의 대기만 취소한다.
+ */
+export type ApiClientRefreshOptions = {
+  signal?: AbortSignal;
+  timeout?: number;
+};
+
+/**
+ * API 클라이언트 타입
  */
 export type ApiClient = {
   /**
-   * GET 요청을 실행합니다.
-   *
-   * @param path - API 경로입니다.
-   * @param options - 요청별 timeout, headers, params, auth 사용 여부 등을 지정합니다.
-   * @returns 응답 body를 호출자가 지정한 타입으로 반환합니다.
+   * Access token refresh를 직접 실행한다.
    */
+  refresh: (options?: ApiClientRefreshOptions) => Promise<void>;
+
   get: <TResponse>(
     path: string,
     options?: ApiClientOptions<unknown>,
   ) => Promise<TResponse>;
 
-  /**
-   * POST 요청을 실행합니다.
-   *
-   * @param path - API 경로입니다.
-   * @param body - JSON으로 직렬화하거나 FormData로 전송할 요청 본문입니다.
-   * @param options - 요청별 timeout, headers, params, auth 사용 여부 등을 지정합니다.
-   * @returns 응답 body를 호출자가 지정한 타입으로 반환합니다.
-   */
   post: <TResponse, TBody = unknown>(
     path: string,
     body?: TBody,
     options?: ApiClientOptions<TBody>,
   ) => Promise<TResponse>;
 
-  /**
-   * PUT 요청을 실행합니다.
-   *
-   * @param path - API 경로입니다.
-   * @param body - JSON으로 직렬화하거나 FormData로 전송할 요청 본문입니다.
-   * @param options - 요청별 timeout, headers, params, auth 사용 여부 등을 지정합니다.
-   * @returns 응답 body를 호출자가 지정한 타입으로 반환합니다.
-   */
   put: <TResponse, TBody = unknown>(
     path: string,
     body?: TBody,
     options?: ApiClientOptions<TBody>,
   ) => Promise<TResponse>;
 
-  /**
-   * PATCH 요청을 실행합니다.
-   *
-   * @param path - API 경로입니다.
-   * @param body - JSON으로 직렬화하거나 FormData로 전송할 요청 본문입니다.
-   * @param options - 요청별 timeout, headers, params, auth 사용 여부 등을 지정합니다.
-   * @returns 응답 body를 호출자가 지정한 타입으로 반환합니다.
-   */
   patch: <TResponse, TBody = unknown>(
     path: string,
     body?: TBody,
     options?: ApiClientOptions<TBody>,
   ) => Promise<TResponse>;
 
-  /**
-   * DELETE 요청을 실행합니다.
-   *
-   * @param path - API 경로입니다.
-   * @param options - 요청별 timeout, headers, params, auth 사용 여부 등을 지정합니다.
-   * @returns 응답 body를 호출자가 지정한 타입으로 반환합니다.
-   */
   delete: <TResponse>(
     path: string,
     options?: ApiClientOptions,

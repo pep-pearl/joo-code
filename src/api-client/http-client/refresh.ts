@@ -1,72 +1,67 @@
 import {
   ApiError,
-  isApiErrorResponse,
-  isRefreshSessionExpiredCode,
   isRefreshUserBlockedCode,
 } from "../api-error";
 import {
   clearStoredTokens,
+  getAccessToken,
   getRefreshToken,
   setAccessToken,
   setRefreshToken,
 } from "./storage";
-import type { ResolvedApiClientConfig } from "./types";
+import type {
+  ApiClientRefreshOptions,
+  ResolvedApiClientConfig,
+} from "./types";
 import {
-  createApiError,
+  createAbortError,
+  createAbortScope,
   createUrl,
   isSamePath,
   parseResponseBody,
+  toError,
+  waitForPromise,
 } from "./utils";
 
 /**
  * refresh token이 필요한지 확인
- * @param options 인증 여부, API 경로, HTTP 상태 코드, 파싱된 응답 바디, API 클라이언트 설정
- * @returns refresh token이 필요한지 여부
  */
-export const shouldRefreshAccessToken = ({
+export const shouldRefreshAccessToken = <TError extends Error>({
   auth,
   path,
-  status,
+  method,
+  response,
   parsedBody,
   config,
 }: {
   auth: boolean;
   path: string;
-  status: number;
+  method: string;
+  response: Response;
   parsedBody: unknown;
-  config: ResolvedApiClientConfig;
+  config: ResolvedApiClientConfig<TError>;
 }) => {
-  if (!auth || status !== 401 || isSamePath(path, config.refreshPath)) {
+  if (!auth || isSamePath(path, config.refreshPath)) {
     return false;
   }
 
-  if (!isApiErrorResponse(parsedBody)) {
-    return false;
-  }
-
-  return config.refreshableErrorCodes.includes(parsedBody.error.code);
+  return config.shouldRefresh({
+    auth,
+    status: response.status,
+    parsedBody,
+    response,
+    method,
+    path,
+    refreshPath: config.refreshPath,
+  });
 };
 
-/**
- * refresh token이 만료되었는지 확인
- * @param error 에러 객체
- * @returns refresh token이 만료되었는지 여부
- */
 export const isRefreshAuthExpiredError = (
   error: unknown,
 ): error is ApiError => {
-  return (
-    error instanceof ApiError &&
-    error.status === 401 &&
-    isRefreshSessionExpiredCode(error.code)
-  );
+  return error instanceof ApiError && error.status === 401;
 };
 
-/**
- * refresh token이 비활성화되었는지 확인
- * @param error 에러 객체
- * @returns refresh token이 비활성화되었는지 여부
- */
 export const isRefreshUserBlockedError = (
   error: unknown,
 ): error is ApiError => {
@@ -77,21 +72,15 @@ export const isRefreshUserBlockedError = (
   );
 };
 
-/**
- * refresh token을 쿠키로 전달해야 하는지 확인
- * @param config API 클라이언트 설정
- * @returns refresh token을 쿠키로 전달해야 하는지 여부
- */
-export const shouldSendRefreshCookie = (config: ResolvedApiClientConfig) => {
+export const shouldSendRefreshCookie = <TError extends Error>(
+  config: ResolvedApiClientConfig<TError>,
+) => {
   return config.refreshTokenTransport === "cookie";
 };
 
-/**
- * refresh token을 body로 전달해야 하는지 확인
- * @param config API 클라이언트 설정
- * @returns refresh token을 body로 전달해야 하는지 여부
- */
-export const createRefreshRequestBody = (config: ResolvedApiClientConfig) => {
+export const createRefreshRequestBody = <TError extends Error>(
+  config: ResolvedApiClientConfig<TError>,
+) => {
   if (config.refreshTokenTransport !== "body") {
     return undefined;
   }
@@ -109,45 +98,83 @@ export const createRefreshRequestBody = (config: ResolvedApiClientConfig) => {
 };
 
 /**
- * refresh token 갱신을 요청한 경우,
- * 2개 이상의 요청이 발생하는 것을 막는 변수
+ * resolved config 인스턴스별 refresh single-flight.
+ * 서로 다른 클라이언트의 fetcher/handler가 섞이지 않도록 WeakMap으로 격리한다.
  */
-const refreshFlights = new Map<string, Promise<void>>();
+const refreshFlights = new WeakMap<object, Promise<void>>();
 
-const createRefreshFlightKey = (
-  apiBaseUrl: string,
-  config: ResolvedApiClientConfig,
+const hasAuthSessionChanged = <TError extends Error>(
+  config: ResolvedApiClientConfig<TError>,
+  accessTokenBeforeRefresh: string | null,
+  refreshTokenBeforeRefresh: string | null,
 ) => {
-  return JSON.stringify({
-    accessTokenKey: config.accessTokenKey,
-    authMode: config.authMode,
-    refreshTokenKey: config.refreshTokenKey,
-    refreshTokenTransport: config.refreshTokenTransport,
-    url: createUrl(apiBaseUrl, config.refreshPath),
-  });
+  return (
+    config.authMode === "localStorage" &&
+    (getAccessToken(config.accessTokenKey, config.tokenStorage) !==
+      accessTokenBeforeRefresh ||
+      getRefreshToken(config.refreshTokenKey, config.tokenStorage) !==
+        refreshTokenBeforeRefresh)
+  );
 };
 
 /**
- * access token 갱신
- * @param apiBaseUrl API 기본 URL
- * @param config API 클라이언트 설정
- * @returns Promise<void>
+ * refresh token 갱신 실패 처리.
+ * refresh flight 내부에서만 호출되어 동시 요청 수와 무관하게 한 번 실행된다.
  */
-export const refreshAccessToken = async (
+export const handleRefreshFailure = async <TError extends Error>(
+  error: unknown,
   apiBaseUrl: string,
-  config: ResolvedApiClientConfig,
+  config: ResolvedApiClientConfig<TError>,
 ) => {
-  const flightKey = createRefreshFlightKey(apiBaseUrl, config);
-  const pendingRefresh = refreshFlights.get(flightKey);
+  const normalizedError = toError(error);
+  const context = {
+    apiBaseUrl,
+    method: "POST" as const,
+    path: config.refreshPath,
+    url: createUrl(apiBaseUrl, config.refreshPath),
+    clearTokens: () => clearStoredTokens(config),
+  };
 
-  if (pendingRefresh) {
-    return pendingRefresh;
+  if (config.onRefreshFailure) {
+    await config.onRefreshFailure(normalizedError, context);
+    return;
   }
 
-  const refreshFlight = (async () => {
-    const body = createRefreshRequestBody(config);
+  // 기존 프로젝트용 기본 정책. 범용 사용에서는 onRefreshFailure 주입을 권장한다.
+  if (isRefreshAuthExpiredError(error)) {
+    context.clearTokens();
+    config.onAuthExpired?.(error);
+    return;
+  }
 
-    const response = await config.fetcher(createUrl(apiBaseUrl, config.refreshPath), {
+  if (isRefreshUserBlockedError(error)) {
+    context.clearTokens();
+    config.onUserBlocked?.(error);
+  }
+};
+
+const runRefreshFlight = async <TError extends Error>(
+  apiBaseUrl: string,
+  config: ResolvedApiClientConfig<TError>,
+) => {
+  const accessTokenBeforeRefresh = getAccessToken(
+    config.accessTokenKey,
+    config.tokenStorage,
+  );
+  const refreshTokenBeforeRefresh = getRefreshToken(
+    config.refreshTokenKey,
+    config.tokenStorage,
+  );
+  const body = createRefreshRequestBody(config);
+  const url = createUrl(apiBaseUrl, config.refreshPath);
+  const abortScope = createAbortScope({
+    signal: config.refreshSignal,
+    timeout: config.refreshTimeout,
+    timeoutMessage: `POST ${config.refreshPath} timed out after ${config.refreshTimeout}ms.`,
+  });
+
+  try {
+    const response = await config.fetcher(url, {
       method: "POST",
       headers: {
         Accept: "application/json",
@@ -155,35 +182,48 @@ export const refreshAccessToken = async (
       },
       body,
       credentials: shouldSendRefreshCookie(config) ? "include" : "omit",
+      signal: abortScope.signal,
     });
-
     const parsedBody = await parseResponseBody(response);
 
     if (!response.ok) {
-      throw createApiError({
+      throw config.createError({
+        phase: "refresh",
         status: response.status,
-          fallbackMessage: `토큰 갱신에 실패했습니다. (${response.status})`,
+        fallbackMessage: `Token refresh failed. (${response.status})`,
         parsedBody,
+        response,
+        method: "POST",
+        path: config.refreshPath,
+        url,
       });
     }
 
-      /**
-       * production cookie mode:
-       * - BE가 Set-Cookie로 access/refresh를 갱신한다면 FE가 저장할 토큰이 없다.
-       *
-       * development localStorage mode:
-       * - BE refresh 응답 data.access_token / data.refresh_token을 storage에 반영한다.
-       */
     if (config.authMode === "localStorage") {
       const tokens = config.getRefreshTokens(parsedBody);
 
       if (!tokens.accessToken) {
-        throw new ApiError({
+        throw config.createError({
+          phase: "refresh",
           status: 500,
           code: "MISSING_ACCESS_TOKEN",
-            message: "refresh 응답에 access_token이 없습니다.",
-          body: parsedBody,
+          fallbackMessage: "refresh 응답에 access_token이 없습니다.",
+          parsedBody,
+          response,
+          method: "POST",
+          path: config.refreshPath,
+          url,
         });
+      }
+
+      if (
+        hasAuthSessionChanged(
+          config,
+          accessTokenBeforeRefresh,
+          refreshTokenBeforeRefresh,
+        )
+      ) {
+        return;
       }
 
       setAccessToken(
@@ -200,34 +240,49 @@ export const refreshAccessToken = async (
         );
       }
     }
-  })().finally(() => {
-    if (refreshFlights.get(flightKey) === refreshFlight) {
-      refreshFlights.delete(flightKey);
+  } catch (error) {
+    if (
+      !hasAuthSessionChanged(
+        config,
+        accessTokenBeforeRefresh,
+        refreshTokenBeforeRefresh,
+      )
+    ) {
+      await handleRefreshFailure(error, apiBaseUrl, config);
     }
-  });
-
-  refreshFlights.set(flightKey, refreshFlight);
-
-  return refreshFlight;
+    throw error;
+  } finally {
+    abortScope.cleanup();
+  }
 };
 
 /**
- * refresh token 갱신 실패 처리
- * @param error 에러 객체
- * @param config API 클라이언트 설정
+ * access token 갱신.
+ * options.signal/timeout은 공유 flight를 중단하지 않고 현재 호출자의 대기만 중단한다.
  */
-export const handleRefreshFailure = (
-  error: unknown,
-  config: ResolvedApiClientConfig,
-) => {
-  if (isRefreshAuthExpiredError(error)) {
-    clearStoredTokens(config);
-    config.onAuthExpired?.(error);
-    return;
+export const refreshAccessToken = <TError extends Error>(
+  apiBaseUrl: string,
+  config: ResolvedApiClientConfig<TError>,
+  options: ApiClientRefreshOptions = {},
+): Promise<void> => {
+  if (options.signal?.aborted) {
+    return Promise.reject(options.signal.reason ?? createAbortError());
   }
 
-  if (isRefreshUserBlockedError(error)) {
-    clearStoredTokens(config);
-    config.onUserBlocked?.(error);
+  let refreshFlight = refreshFlights.get(config);
+
+  if (!refreshFlight) {
+    refreshFlight = runRefreshFlight(apiBaseUrl, config).finally(() => {
+      if (refreshFlights.get(config) === refreshFlight) {
+        refreshFlights.delete(config);
+      }
+    });
+    refreshFlights.set(config, refreshFlight);
   }
+
+  return waitForPromise(refreshFlight, {
+    signal: options.signal,
+    timeout: options.timeout,
+    timeoutMessage: `Waiting for token refresh timed out after ${options.timeout}ms.`,
+  });
 };

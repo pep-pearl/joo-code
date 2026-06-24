@@ -137,8 +137,8 @@ useConfirmAlertDialogStore.getState().confirm({
 ## 확인
 
 ```bash
-npm run storybook
-npm run playground
+pnpm storybook
+pnpm playground
 ```
 
 Storybook의 `React/Dialog`에서 confirm, alert, custom body, 일반 dialog를 확인할 수 있습니다.

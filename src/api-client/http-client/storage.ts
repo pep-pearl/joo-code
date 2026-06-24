@@ -1,12 +1,3 @@
-/*
- * @ai-purpose localStorage mode에서 access/refresh token을 읽고 쓰는 helper를 제공한다.
- * @ai-entry false
- * @ai-domain api, auth, shared
- * @ai-depends ./types
- * @ai-used-by http-client headers, refresh flow, login/logout integration code
- * @ai-keywords token storage, createAuthTokenStorage, access_token, refresh_token
- */
-
 import type {
   AuthTokenPayload,
   ResolvedApiClientConfig,
@@ -42,7 +33,10 @@ export const DEFAULT_REFRESH_TOKEN_KEY = "refresh_token";
  * @param key Access Token Key
  * @returns Access Token
  */
-export const getAccessToken = (key: string, storage = getDefaultTokenStorage()) => {
+export const getAccessToken = (
+  key: string,
+  storage = getDefaultTokenStorage(),
+) => {
   if (!storage) {
     return null;
   }
@@ -85,7 +79,10 @@ export const setRefreshToken = (
   storage.setItem(key, token);
 };
 
-export const clearStoredTokens = (config: ResolvedApiClientConfig) => {
+export const clearStoredTokens = (config: Pick<
+  ResolvedApiClientConfig<Error>,
+  "accessTokenKey" | "refreshTokenKey" | "tokenStorage"
+>) => {
   const storage = config.tokenStorage ?? getDefaultTokenStorage();
 
   if (!storage) {
@@ -103,35 +100,45 @@ export const clearStoredTokens = (config: ResolvedApiClientConfig) => {
 export const createAuthTokenStorage = ({
   accessTokenKey = DEFAULT_ACCESS_TOKEN_KEY,
   refreshTokenKey = DEFAULT_REFRESH_TOKEN_KEY,
-  storage = getDefaultTokenStorage(),
+  storage,
 }: {
   accessTokenKey?: string;
   refreshTokenKey?: string;
   storage?: TokenStorage;
-} = {}) => ({
-  getAccessToken: () => getAccessToken(accessTokenKey, storage),
-  getRefreshToken: () => getRefreshToken(refreshTokenKey, storage),
-  setTokens: ({
-    access_token,
-    refresh_token,
-  }: Pick<AuthTokenPayload, "access_token" | "refresh_token">) => {
-    if (access_token) {
-      setAccessToken(accessTokenKey, access_token, storage);
-    }
+} = {}) => {
+  const getStorage = () => storage ?? getDefaultTokenStorage();
 
-    if (refresh_token) {
-      setRefreshToken(refreshTokenKey, refresh_token, storage);
-    }
-  },
-  clear: () => {
-    if (!storage) {
-      return;
-    }
+  return {
+    getAccessToken: () => getAccessToken(accessTokenKey, getStorage()),
+    getRefreshToken: () => getRefreshToken(refreshTokenKey, getStorage()),
 
-    storage.removeItem(accessTokenKey);
-    storage.removeItem(refreshTokenKey);
-  },
-});
+    setTokens: ({
+      access_token,
+      refresh_token,
+    }: Pick<AuthTokenPayload, "access_token" | "refresh_token">) => {
+      const currentStorage = getStorage();
+
+      if (access_token) {
+        setAccessToken(accessTokenKey, access_token, currentStorage);
+      }
+
+      if (refresh_token) {
+        setRefreshToken(refreshTokenKey, refresh_token, currentStorage);
+      }
+    },
+
+    clear: () => {
+      const currentStorage = getStorage();
+
+      if (!currentStorage) {
+        return;
+      }
+
+      currentStorage.removeItem(accessTokenKey);
+      currentStorage.removeItem(refreshTokenKey);
+    },
+  };
+};
 
 // refresh lock storage =================================================
 
@@ -147,7 +154,8 @@ const DEFAULT_REFRESH_LOCK_TTL = 15_000; // 15s
 
 /**
  * refresh lock storage를 생성
- * @param options - refresh lock key와 ttl을 지정하는 옵션입니다.
+ * @param lockKey refresh lock key
+ * @param lockTtl refresh lock ttl
  * @returns refresh lock storage
  */
 export const createRefreshLockStorage = ({

@@ -1,13 +1,18 @@
 # joo-code
 
-자주 쓰는 TypeScript와 React 코드를 **빠르게 찾고, 직접 실행해 보고, 필요한 파일만 복사하기 위한 개인 코드 모음집**입니다.
+자주 쓰는 TypeScript와 React 코드를 **빠르게 찾고, 직접 실행해 보고, 필요한 파일이나 폴더만 복사하기 위한 개인 코드 아카이브**입니다.
 
-패키지 배포나 큰 문서 사이트보다 다음 네 가지를 우선합니다.
+이 저장소는 npm 배포용 패키지가 아닙니다. 여러 프로젝트에 설치해서 쓰기보다, 상황에 맞는 코드를 찾아 복사하고 프로젝트에 맞게 다듬는 것을 우선합니다.
 
-1. 함수 이름과 파일 이름이 같아 바로 찾을 수 있다.
-2. 실제 구현은 `src` 한 곳에만 존재한다.
-3. `index.ts`는 구현하지 않고 공개할 항목만 export한다.
-4. playground에서 public API를 실제로 실행해 본다.
+## 원칙
+
+1. 함수 이름과 파일 이름을 최대한 맞춰 바로 찾을 수 있게 한다.
+2. 실제 구현은 `src` 한 곳에서 관리한다.
+3. 각 `index.ts`는 구현을 넣지 않고 공개할 항목만 export한다.
+4. 루트 `src/index.ts`는 playground 검증용 전체 public API를 export한다.
+5. playground와 Storybook으로 복사 전 동작을 확인한다.
+
+> 루트 `src/index.ts`는 전체 public API 확인을 위한 진입점입니다. 다른 프로젝트로 옮길 때는 루트 전체를 가져가기보다 필요한 파일이나 폴더만 복사하는 것을 권장합니다. 특히 `react`, `react-router`, `ui` 계열은 React, React Router, Headless UI, Zustand, Tailwind CSS 같은 의존성이 함께 필요할 수 있습니다.
 
 ## 바로 찾기
 
@@ -21,7 +26,7 @@
 | React 페이지네이션 구성 | [`pagination`](src/react/pagination/README.md) | 파일 또는 폴더 | React |
 | 전역 dialog와 confirm/alert | [`dialog`](src/react/dialog/README.md) | 폴더 전체 | React, Headless UI, Zustand |
 | 현재 React Router 경로 조회 | [`useCurrentRoute`](src/react-router/useCurrentRoute.ts) | 폴더 또는 파일 | React Router |
-| 인증·refresh 포함 API 요청 | [`api-client`](src/api-client/README.md) | 폴더 전체 | 없음 |
+| 인증·refresh 포함 API 요청 | [`api-client`](src/api-client/README.md) | 폴더 전체 | Fetch API |
 | 다운로드 API 응답 파싱 | [`api-parser`](src/api-parser/README.md) | 파일 또는 폴더 | Fetch API |
 | API 경로와 메서드 트리 관리 | [`api-tree`](src/api-tree/README.md) | 폴더 전체 | 없음 |
 | 외부 이벤트로 Promise 완료 | [`createDeferred`](src/promise/README.md) | 파일 1개 | 없음 |
@@ -40,18 +45,22 @@ joo-code/
 │  ├─ browser/        # 브라우저 DOM 유틸
 │  ├─ react/          # React만 사용하는 코드
 │  ├─ react-router/   # React Router 의존 코드
-│  ├─ api-client/     # 여러 파일이 함께 동작하는 복합 모듈
+│  ├─ api-client/     # fetch, 인증, refresh, API error 복합 모듈
 │  ├─ api-parser/     # API 응답 parser
 │  ├─ api-tree/       # API 경로와 HTTP 메서드 선언 트리
 │  ├─ promise/        # 범용 Promise 제어 유틸리티
 │  ├─ ui/             # 재사용 UI 컴포넌트와 Storybook 스토리
-│  └─ index.ts        # 전체 public API
+│  └─ index.ts        # 전체 public API 검증용 export
 ├─ .storybook/        # UI 컴포넌트 문서와 시각 확인 설정
 ├─ playground/        # src의 public API를 직접 실행하는 Vite 앱
 ├─ tools/             # 다른 프로젝트에도 복사 가능한 작업 도구
 ├─ package.json
+├─ pnpm-lock.yaml
+├─ pnpm-workspace.yaml
 └─ README.md
 ```
+
+임시 실험, 빌드 결과물, 개인 작업 흔적은 저장소와 ZIP에 포함하지 않습니다. 대표적으로 `src/temp`, `src/api-slot-kit`, `.superpowers`, `docs/superpowers`, `storybook-static`은 제외 대상입니다.
 
 각 폴더의 `index.ts`는 public API 역할만 합니다.
 
@@ -62,13 +71,15 @@ export * from "./roman-to-number";
 
 ## 처음 실행
 
+이 프로젝트는 pnpm 기준으로 관리합니다.
+
 ```bash
-npm install
-npm run check
-npm run playground
+pnpm install
+pnpm verify
+pnpm playground
 ```
 
-`npm run playground`를 실행하면 브라우저에서 숫자 포맷, 로마 숫자, debounce hook, viewport 높이, 페이지네이션, API tree, API parser, dialog 코드를 직접 확인할 수 있습니다. UI 컴포넌트는 Storybook에서 확인합니다.
+`pnpm playground`를 실행하면 브라우저에서 숫자 포맷, 로마 숫자, debounce hook, viewport 높이, 페이지네이션, API tree, API parser, dialog 코드를 직접 확인할 수 있습니다. UI 컴포넌트는 Storybook에서 확인합니다.
 
 ## 코드를 사용하는 두 가지 방법
 
@@ -101,18 +112,18 @@ import {
 
 ## 프로젝트 ZIP 만들기
 
-Linux, macOS, Windows에서 같은 npm 명령을 사용합니다.
+Linux, macOS, Windows에서 같은 pnpm 명령을 사용합니다.
 
 ```bash
-npm run zip
+pnpm zip
 ```
 
-기본적으로 현재 프로젝트의 한 단계 위에 `joo-code.zip`이 생성됩니다. `node_modules`, 빌드 결과물, Git 데이터, `.env` 파일은 제외됩니다.
+기본적으로 현재 프로젝트의 한 단계 위에 `joo-code.zip`이 생성됩니다. `node_modules`, 빌드 결과물, Git 데이터, `.env` 파일, 임시 실험 폴더는 제외됩니다.
 
-출력 경로를 바꾸려면 npm 인자를 전달합니다.
+출력 경로를 바꾸려면 pnpm 인자를 전달합니다.
 
 ```bash
-npm run zip -- --output ./backup/joo-code.zip
+pnpm zip -- --output ./backup/joo-code.zip
 ```
 
 ZIP 도구 자체도 [`zip-project.mjs`](tools/project-zip/zip-project.mjs) 한 파일만 다른 프로젝트에 복사해 사용할 수 있습니다.
@@ -121,12 +132,14 @@ ZIP 도구 자체도 [`zip-project.mjs`](tools/project-zip/zip-project.mjs) 한 
 
 | 명령어 | 역할 |
 | --- | --- |
-| `npm run check` | `src`와 playground TypeScript 검사 |
-| `npm run playground` | playground 개발 서버 실행 |
-| `npm run playground:build` | playground 프로덕션 빌드 검사 |
-| `npm run storybook` | UI 컴포넌트 Storybook 개발 서버 실행 |
-| `npm run build-storybook` | 정적 Storybook 빌드 검사 |
-| `npm run zip` | 현재 프로젝트 공유용 ZIP 생성 |
+| `pnpm check` | `src`와 playground TypeScript 검사 |
+| `pnpm test` | Vitest 테스트 실행 |
+| `pnpm verify` | 타입 검사, 테스트, playground 빌드, Storybook 빌드 실행 |
+| `pnpm playground` | playground 개발 서버 실행 |
+| `pnpm playground:build` | playground 프로덕션 빌드 검사 |
+| `pnpm storybook` | UI 컴포넌트 Storybook 개발 서버 실행 |
+| `pnpm build-storybook` | 정적 Storybook 빌드 검사 |
+| `pnpm zip` | 현재 프로젝트 공유용 ZIP 생성 |
 
 ## 새 코드 추가 규칙
 
@@ -135,6 +148,7 @@ ZIP 도구 자체도 [`zip-project.mjs`](tools/project-zip/zip-project.mjs) 한 
 3. 같은 폴더의 `index.ts`에 export를 추가한다.
 4. 루트의 **바로 찾기** 표에 한 줄 추가한다.
 5. 함수 동작은 playground에, UI 컴포넌트 상태는 Storybook에 작은 예제를 추가한다.
+6. `pnpm verify`로 public API와 예제 빌드를 함께 확인한다.
 
 여러 파일이 반드시 함께 움직이는 코드만 별도 폴더로 묶습니다. 파일이 두세 개라는 이유만으로 새 패키지나 workspace를 만들지 않습니다.
 
@@ -155,6 +169,6 @@ ZIP 도구 자체도 [`zip-project.mjs`](tools/project-zip/zip-project.mjs) 한 
 | --- | --- |
 | 코드를 찾는 미래의 나 | README 표와 파일명만 보고 빠르게 위치를 찾는다. |
 | 복사하는 나 | 복사 단위와 외부 의존성을 바로 알 수 있다. |
-| 시험하는 나 | 별도 앱을 만들지 않고 playground에서 실행한다. |
+| 시험하는 나 | 별도 앱을 만들지 않고 playground와 Storybook에서 확인한다. |
 | 수정하는 나 | 같은 구현을 여러 경로에서 중복 관리하지 않는다. |
-| 공유하는 나 | `npm run zip` 한 번으로 불필요한 파일을 제외한 압축본을 만든다. |
+| 공유하는 나 | `pnpm zip` 한 번으로 불필요한 파일을 제외한 압축본을 만든다. |

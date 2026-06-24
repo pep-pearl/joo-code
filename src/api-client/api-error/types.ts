@@ -2,31 +2,37 @@ import type { ApiMeta } from "../types";
 export type { ApiMeta };
 
 /**
- * API 에러 상세 정보입니다.
- *
- * - `field`는 form field 검증 실패 위치를 나타냅니다.
- * - `param`은 query 또는 path parameter 검증 실패 위치를 나타냅니다.
- * - `rule`은 실패한 검증 규칙이나 서버가 내려준 상세 코드를 담습니다.
+ * API 에러 상세 정보
  */
-export type ApiErrorDetail = {
-  field?: string;
-  param?: string;
-  rule?: string;
+export type ApiErrorDetail<
+  TField extends string = string,
+  TParam extends string = string,
+  TRule extends string = string,
+> = {
+  field?: TField;
+  param?: TParam;
+  rule?: TRule;
 };
 
 /**
- * 서버가 내려주는 API 에러 payload 타입입니다.
+ * API 에러 응답 페이로드 타입
  */
-export type ApiErrorPayload = {
-  code: string;
+export type ApiErrorPayload<
+  TCode extends string = string,
+  TDetail = ApiErrorDetail,
+> = {
+  code: TCode;
   message: string;
-  details?: ApiErrorDetail[];
+  details?: TDetail[];
 };
 
 /**
- * 서버가 실패 응답으로 반환하는 공통 error envelope 타입입니다.
+ * API 에러 응답 타입
  */
-export type ApiErrorResponse = {
-  error: ApiErrorPayload;
-  meta?: ApiMeta;
+export type ApiErrorResponse<
+  TPayload extends { code: string; message: string } = ApiErrorPayload,
+  TMeta = ApiMeta,
+> = {
+  error: TPayload;
+  meta?: TMeta;
 };

@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import {
   DialogPanel,
+  Button,
   DialogProvider,
   apiMap,
   formatCommaNumber,
@@ -14,7 +15,6 @@ import {
   usePages,
   usePaginationButtonsAttrs,
 } from "../../src";
-import { Button } from "../../src/ui/Button";
 
 declare module "../../src/react/dialog" {
   interface AppDialogPropMap {
@@ -81,7 +81,7 @@ export function App() {
   };
 
   const parseSampleDownload = async () => {
-    const response = new Response(["id,name\n1,example"], {
+    const response = new Response("id,name\n1,example", {
       headers: {
         "Content-Disposition": 'attachment; filename="report.csv"',
         "Content-Type": "text/csv",
