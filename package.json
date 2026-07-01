@@ -11,6 +11,7 @@
     "playground": "vite playground",
     "playground:build": "vite build playground --outDir ../dist/playground --emptyOutDir",
     "zip": "node ./tools/project-zip/zip-project.mjs",
+    "zip:windows": "powershell -NoProfile -ExecutionPolicy Bypass -File ./tools/project-zip/zip-project.ps1",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build"
   },
